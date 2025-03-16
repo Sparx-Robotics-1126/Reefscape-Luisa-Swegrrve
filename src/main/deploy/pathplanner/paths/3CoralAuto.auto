@@ -1,0 +1,126 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "3 Coral (1)"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToL4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToL4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToL4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToL4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpinPlacerOut"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "3 Coral (2)"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "MoveArmToCoral"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "MoveExtensionToCoral"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "IngestCoral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToCoral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToCoral"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

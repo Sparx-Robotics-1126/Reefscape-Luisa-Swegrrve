@@ -1,0 +1,201 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DumpL1 (1) R RED"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToL1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToL1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToL1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToL1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpinPlacerIn"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DumpL1 (2) R RED"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToCoral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToCoral"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToCoral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToCoral"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "IngestCoral"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "PositionCoral"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DumpL1 (3) R RED"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToL1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToL1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToL1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToL1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpinPlacerIn"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DumpL1 (4) R RED"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToHome"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToHome"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "DumpL1 RED",
+  "choreoAuto": false
+}

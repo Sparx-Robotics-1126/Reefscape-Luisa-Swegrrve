@@ -1,0 +1,88 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DumpL1 (1) L BLU"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToL1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToL1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpinPlacerOut"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToL1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToL1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "DumpL1 (2) L BLU"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveArmToHome"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveExtensionToHome"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "DumpL1 BLU",
+  "choreoAuto": false
+}
