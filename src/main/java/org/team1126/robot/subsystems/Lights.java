@@ -51,8 +51,8 @@ public final class Lights {
         }
     }
 
-    private static final int kStripLength = 28;
-    private static final int kStripCount = 3;
+    private static final int kStripLength = 200;
+    private static final int kStripCount = 1;
 
     public final Sides sides;
     public final Top top;

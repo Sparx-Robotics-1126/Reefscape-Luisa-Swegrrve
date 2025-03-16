@@ -1,6 +1,8 @@
 package org.team1126.robot;
 
 import choreo.util.ChoreoAllianceFlipUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -16,7 +18,7 @@ public final class Constants {
     public static final double kVoltage = 12.0;
 
     public static final int kDriver = 0;
-    public static final int kCoDriver = 1;
+    public static final int kOperator = 1;
 
     public static final class FieldConstants {
 
@@ -53,57 +55,34 @@ public final class Constants {
         );
     }
 
-    /**
-     * The RobotMap class defines CAN IDs, CAN bus names, DIO/PWM/PH/PCM channel
-     * IDs, and other relevant identifiers for addressing robot hardware.
-     */
-    public static final class LowerCAN {
+   
+  public static final class ArmConstants {
+    public static final int TURN_ONE_ID = 31;
+    public static final int TURN_TWO_ID = 32;
+    public static final int ELEVATOR_ID = 33;
+    public static final int ARM_SENSOR_ID = 1; //need to be changed
+    public static final int EXTENSION_SENSOR_ID = 2; //also needs changing!!
+    public static final double L1_ARM_POS = 11.76196;
+    public static final double L2_ARM_POS = 22.238;
+    public static final double L3_ARM_POS = 26.5;
+    public static final double L4_ARM_POS = 33.5;
+}
 
-        // upper CAN bus is the default CAN bus.
-        // Talon FX default constructor uses "" and we can't change it.
-        public static final String kLowerCANBus = "LowerCAN";
+public static final class PlacerConstants {
+    public static final int PLACER_ID = 34;
+    public static final int PLACER_FOLLOWER_ID = 35;
+    public static final int PLACER_BOTTOM_ID = 15; // CHANGE THESE!!!!!
+    public static final int PLACER_TOP_ID = 12;
+}
 
-        // *************** Lower CAN Bus ***************
+public static final class ClimbConstants {
+    public static final int CLIMB_ID = 41;
+}
 
-        // Swerve
-
-        public static final int kFlMove = 2;
-        public static final int kFlTurn = 3;
-        public static final int kFrMove = 4;
-        public static final int kFrTurn = 5;
-        public static final int kBlMove = 6;
-        public static final int kBlTurn = 7;
-        public static final int kBrMove = 8;
-        public static final int kBrTurn = 9;
-
-        public static final int kFlEncoder = 10;
-        public static final int kFrEncoder = 11;
-        public static final int kBlEncoder = 12;
-        public static final int kBrEncoder = 13;
-
-        public static final int kCanandgyro = 14;
-
-        // Elevator
-        public static final int kElevatorLead = 20;
-        public static final int kElevatorFollow = 21;
-        public static final int kElevatorCANdi = 22;
-    }
-
-    public static final class UpperCAN {
-
-        //*************** Upper CAN Bus ***************
-
-        // Goose
-        public static final int kGooseNeckMotor = 30;
-        public static final int kGooseBeakMotor = 31;
-        public static final int kGooseCANdi = 32;
-
-        // Intake
-        public static final int kIntakeMotor = 40;
-
-        // Climber
-        public static final int kClimberMotor = 50;
-    }
+public static final class CoralConstants {
+    public static final int CORAL_WHEELS_ID = 51;
+    public static final int CORAL_PIVOT_ID = 52;
+}
 
     public static final class RioIO {
 
@@ -112,4 +91,56 @@ public final class Constants {
 
         public static final int kClimberLimitSwitch = 0;
     }
+
+    public static final class RobotMap {
+
+        public static final String kSwerveCANBus = "";
+
+        public static final int kFlMove = 2;
+        public static final int kFlTurn = 3;
+        public static final int kFrMove = 5;
+        public static final int kFrTurn = 6;
+        public static final int kBlMove = 11;
+        public static final int kBlTurn = 12;
+        public static final int kBrMove = 8;
+        public static final int kBrTurn = 9;
+
+        public static final int kFlEncoder = 4;
+        public static final int kFrEncoder = 7;
+        public static final int kBlEncoder = 13;
+        public static final int kBrEncoder = 10;
+
+        public static final int kCanandgyro = 14;
+    }
+  public static final class AprilTagPositions {
+    public static final Pose2d[] APRILTAGS_BLU = new Pose2d[6];
+      static {
+        APRILTAGS_BLU[0] = new Pose2d(3.074, 4.021, Rotation2d.fromDegrees(0.0));
+        APRILTAGS_BLU[1] = new Pose2d(3.798, 2.829, Rotation2d.fromDegrees(59.79)); 
+        APRILTAGS_BLU[2] = new Pose2d(5.165, 2.84, Rotation2d.fromDegrees(121.227));
+        APRILTAGS_BLU[3] = new Pose2d(5.889, 3.82, Rotation2d.fromDegrees(180));
+        APRILTAGS_BLU[4] = new Pose2d(5.178, 5.184, Rotation2d.fromDegrees(-120.351));
+        APRILTAGS_BLU[5] = new Pose2d(3.976, 5.227, Rotation2d.fromDegrees(-59.744));
+      }
+
+    public static final Pose2d[] APRILTAGS_RED = new Pose2d[6];
+      static {
+        APRILTAGS_RED[0] = new Pose2d(14.472, 4.034, Rotation2d.fromDegrees(180));
+        APRILTAGS_RED[1] = new Pose2d(4.034, 5.196, Rotation2d.fromDegrees(-120.478));
+        APRILTAGS_RED[2] = new Pose2d(12.341, 5.225, Rotation2d.fromDegrees(-60.158));
+        APRILTAGS_RED[3] = new Pose2d(11.672, 4.011, Rotation2d.fromDegrees(0.0));
+        APRILTAGS_RED[4] = new Pose2d(-60.158, 2.834, Rotation2d.fromDegrees(60.195));
+        APRILTAGS_RED[5] = new Pose2d(60.195, 60.195, Rotation2d.fromDegrees(120.407));
+      }
+  }
+
+  public static class OperatorConstants
+  {
+
+    // Joystick Deadband
+    public static final double DEADBAND        = 0.1;
+    public static final double LEFT_Y_DEADBAND = 0.1;
+    public static final double RIGHT_X_DEADBAND = 0.1;
+    public static final double TURN_CONSTANT    = 6;
+  }
 }

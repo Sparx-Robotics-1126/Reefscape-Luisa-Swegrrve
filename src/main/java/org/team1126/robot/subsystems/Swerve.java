@@ -3,6 +3,8 @@ package org.team1126.robot.subsystems;
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.CANBus;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.PIDController;
@@ -35,7 +37,7 @@ import org.team1126.lib.util.Tunable.TunableDouble;
 import org.team1126.lib.util.command.GRRSubsystem;
 import org.team1126.robot.Constants;
 import org.team1126.robot.Constants.FieldConstants;
-import org.team1126.robot.Constants.LowerCAN;
+import org.team1126.robot.Constants.RobotMap;
 import org.team1126.robot.util.VisionManager;
 
 /**
@@ -47,34 +49,33 @@ public final class Swerve extends GRRSubsystem {
     private static final double kMoveRatio = (54.0 / 10.0) * (18.0 / 38.0) * (45.0 / 15.0);
     private static final double kTurnRatio = (22.0 / 10.0) * (88.0 / 16.0);
     private static final double kModuleOffset = Units.inchesToMeters(12.5);
-
     private static final SwerveModuleConfig kFrontLeft = new SwerveModuleConfig()
-        .setName("frontLeft")
-        .setLocation(kModuleOffset, kModuleOffset)
-        .setMoveMotor(SwerveMotors.talonFX(LowerCAN.kFlMove, true))
-        .setTurnMotor(SwerveMotors.talonFX(LowerCAN.kFlTurn, true))
-        .setEncoder(SwerveEncoders.canCoder(LowerCAN.kFlEncoder, 0.296, false));
+    .setName("frontLeft")
+    .setLocation(0.31115, 0.31115)
+    .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kFlMove, true))
+    .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kFlTurn, true))
+    .setEncoder(SwerveEncoders.canCoder(RobotMap.kFlEncoder, 110.947403125, false));
 
-    private static final SwerveModuleConfig kFrontRight = new SwerveModuleConfig()
-        .setName("frontRight")
-        .setLocation(kModuleOffset, -kModuleOffset)
-        .setMoveMotor(SwerveMotors.talonFX(LowerCAN.kFrMove, true))
-        .setTurnMotor(SwerveMotors.talonFX(LowerCAN.kFrTurn, true))
-        .setEncoder(SwerveEncoders.canCoder(LowerCAN.kFrEncoder, -0.395, false));
+private static final SwerveModuleConfig kFrontRight = new SwerveModuleConfig()
+    .setName("frontRight")
+    .setLocation(0.31115, -0.31115)
+    .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kFrMove, true))
+    .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kFrTurn, true))
+    .setEncoder(SwerveEncoders.canCoder(RobotMap.kFrEncoder, 37.354, false));
 
-    private static final SwerveModuleConfig kBackLeft = new SwerveModuleConfig()
-        .setName("backLeft")
-        .setLocation(-kModuleOffset, kModuleOffset)
-        .setMoveMotor(SwerveMotors.talonFX(LowerCAN.kBlMove, true))
-        .setTurnMotor(SwerveMotors.talonFX(LowerCAN.kBlTurn, true))
-        .setEncoder(SwerveEncoders.canCoder(LowerCAN.kBlEncoder, 0.190, false));
+private static final SwerveModuleConfig kBackLeft = new SwerveModuleConfig()
+    .setName("backLeft")
+    .setLocation(-0.31115, 0.31115)
+    .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kBlMove, false))
+    .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kBlTurn, true))
+    .setEncoder(SwerveEncoders.canCoder(RobotMap.kBlEncoder, 53.685, false));
 
-    private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
-        .setName("backRight")
-        .setLocation(-kModuleOffset, -kModuleOffset)
-        .setMoveMotor(SwerveMotors.talonFX(LowerCAN.kBrMove, true))
-        .setTurnMotor(SwerveMotors.talonFX(LowerCAN.kBrTurn, true))
-        .setEncoder(SwerveEncoders.canCoder(LowerCAN.kBrEncoder, -0.079, false));
+private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
+    .setName("backRight")
+    .setLocation(-0.31115, -0.31115)
+    .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kBrMove, true))
+    .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kBrTurn, true))
+    .setEncoder(SwerveEncoders.canCoder(RobotMap.kBrEncoder, 256.5, false));
 
     private static final SwerveConfig kConfig = new SwerveConfig()
         .setTimings(TimedRobot.kDefaultPeriod, 0.004, 0.02)
@@ -87,8 +88,8 @@ public final class Swerve extends GRRSubsystem {
         .setPowerProperties(Constants.kVoltage, 100.0, 80.0, 60.0, 60.0)
         .setMechanicalProperties(kMoveRatio, kTurnRatio, 0.0, Units.inchesToMeters(4.0))
         .setOdometryStd(0.1, 0.1, 0.1)
-        .setIMU(SwerveIMUs.canandgyro(LowerCAN.kCanandgyro))
-        .setPhoenixFeatures(new CANBus(LowerCAN.kLowerCANBus), true, true, true)
+        .setIMU(SwerveIMUs.canandgyro(RobotMap.kCanandgyro))
+        .setPhoenixFeatures(new CANBus(RobotMap.kSwerveCANBus), true, true, true)
         .setModules(kFrontLeft, kFrontRight, kBackLeft, kBackRight);
 
     private static final TunableDouble kTurboSpin = Tunable.doubleValue("swerve/kTurboSpin", 8.0);
