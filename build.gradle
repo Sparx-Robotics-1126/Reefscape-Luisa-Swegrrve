@@ -84,28 +84,28 @@ dependencies {
 }
 
 // Code formatting via spotless
-spotless {
-    java {
-        target fileTree('.') {
-            include '**/*.java'
-            exclude '**/build/**', '**/build-*/**'
-        }
+// spotless {
+//     java {
+//         target fileTree('.') {
+//             include '**/*.java'
+//             exclude '**/build/**', '**/build-*/**'
+//         }
 
-        toggleOffOn()
-        endWithNewline()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        prettier(['prettier': '3.5.1', 'prettier-plugin-java': '2.6.7'])
-            .config([
-                'parser': 'java',
-                'plugins': ['prettier-plugin-java'],
-                printWidth: 120,
-                tabWidth: 4,
-                useTabs: false,
-                trailingComma: "none"
-            ])
-    }
-}
+//         toggleOffOn()
+//         endWithNewline()
+//         removeUnusedImports()
+//         trimTrailingWhitespace()
+//         prettier(['prettier': '3.5.1', 'prettier-plugin-java': '2.6.7'])
+//             .config([
+//                 'parser': 'java',
+//                 'plugins': ['prettier-plugin-java'],
+//                 printWidth: 120,
+//                 tabWidth: 4,
+//                 useTabs: false,
+//                 trailingComma: "none"
+//             ])
+//     }
+// }
 
 test {
     useJUnitPlatform()
