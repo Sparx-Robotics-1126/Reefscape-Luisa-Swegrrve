@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -41,17 +42,21 @@ public final class Constants {
 
     public final class Cameras {
 
-        public static final Transform3d kMiddle = new Transform3d(
-            new Translation3d(0.354, 0.0, 0.215),
-            new Rotation3d(0.0, Math.toRadians(-5.0), Math.toRadians(0.0))
-        );
+        // public static final Transform3d kMiddle = new Transform3d(
+        //     new Translation3d(0.354, 0.0, 0.215),
+        //     new Rotation3d(0.0, Math.toRadians(-5.0), Math.toRadians(0.0))
+        // );
         public static final Transform3d kLeft = new Transform3d(
-            new Translation3d(0.316, 0.092, 0.211),
-            new Rotation3d(0.0, Math.toRadians(-5.0), Math.toRadians(45.0))
+          new Translation3d(Units.inchesToMeters(12.6),
+          Units.inchesToMeters(12.4),
+          Units.inchesToMeters(8.9)),
+            new Rotation3d(0.0, Math.toRadians(17.3), Math.toRadians(-33.2))
         );
         public static final Transform3d kRight = new Transform3d(
-            new Translation3d(0.316, -0.092, 0.211),
-            new Rotation3d(0.0, Math.toRadians(-5.0), Math.toRadians(-45.0))
+          new Translation3d(Units.inchesToMeters(12.6),
+          Units.inchesToMeters(-11.6),
+          Units.inchesToMeters(8.9)),
+            new Rotation3d(0.0, Math.toRadians(17.3), Math.toRadians(33.2))
         );
     }
 

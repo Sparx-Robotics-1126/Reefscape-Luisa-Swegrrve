@@ -48,31 +48,31 @@ public final class Swerve extends GRRSubsystem {
 
     private static final double kMoveRatio = (54.0 / 10.0) * (18.0 / 38.0) * (45.0 / 15.0);
     private static final double kTurnRatio = (22.0 / 10.0) * (88.0 / 16.0);
-    private static final double kModuleOffset = Units.inchesToMeters(12.5);
+    private static final double kModuleOffset = Units.inchesToMeters(12.25);
     private static final SwerveModuleConfig kFrontLeft = new SwerveModuleConfig()
     .setName("frontLeft")
-    .setLocation(0.31115, 0.31115)
+    .setLocation(kModuleOffset, kModuleOffset)
     .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kFlMove, true))
     .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kFlTurn, true))
     .setEncoder(SwerveEncoders.canCoder(RobotMap.kFlEncoder, 110.947403125, false));
 
 private static final SwerveModuleConfig kFrontRight = new SwerveModuleConfig()
     .setName("frontRight")
-    .setLocation(0.31115, -0.31115)
+    .setLocation(kModuleOffset, -kModuleOffset)
     .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kFrMove, true))
     .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kFrTurn, true))
     .setEncoder(SwerveEncoders.canCoder(RobotMap.kFrEncoder, 37.354, false));
 
 private static final SwerveModuleConfig kBackLeft = new SwerveModuleConfig()
     .setName("backLeft")
-    .setLocation(-0.31115, 0.31115)
+    .setLocation(-kModuleOffset, kModuleOffset)
     .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kBlMove, false))
     .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kBlTurn, true))
     .setEncoder(SwerveEncoders.canCoder(RobotMap.kBlEncoder, 53.685, false));
 
 private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
     .setName("backRight")
-    .setLocation(-0.31115, -0.31115)
+    .setLocation(-kModuleOffset, -kModuleOffset)
     .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kBrMove, true))
     .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kBrTurn, true))
     .setEncoder(SwerveEncoders.canCoder(RobotMap.kBrEncoder, 256.5, false));
@@ -86,7 +86,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         .setLimits(4.0, 0.05, 17.5, 14.0, 30.0)
         .setDriverProfile(4.0, 1.5, 0.15, 4.7, 2.0, 0.05)
         .setPowerProperties(Constants.kVoltage, 100.0, 80.0, 60.0, 60.0)
-        .setMechanicalProperties(kMoveRatio, kTurnRatio, 0.0, Units.inchesToMeters(4.0))
+        .setMechanicalProperties(6.12, 21.4285714286, 0.0, Units.inchesToMeters(4.0))
         .setOdometryStd(0.1, 0.1, 0.1)
         .setIMU(SwerveIMUs.canandgyro(RobotMap.kCanandgyro))
         .setPhoenixFeatures(new CANBus(RobotMap.kSwerveCANBus), true, true, true)

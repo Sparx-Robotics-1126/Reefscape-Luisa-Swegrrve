@@ -4,6 +4,8 @@ import static edu.wpi.first.wpilibj.XboxController.Axis.*;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -12,7 +14,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -65,6 +70,8 @@ public final class Robot extends TimedRobot {
 
     private final CommandXboxController driver;
     private final CommandXboxController operator;
+    final static SendableChooser<Command> chooser = new SendableChooser<>();
+    
 
     public Robot() {
         DriverStation.silenceJoystickConnectionWarning(true);
@@ -85,7 +92,7 @@ public final class Robot extends TimedRobot {
         leds = new LEDs(0,200);
         // lights = new Lights(); //TODO: May need to change
         swerve = new Swerve();
-
+        
         // Initialize helpers
         selection = new ReefSelection();
 
@@ -97,8 +104,11 @@ public final class Robot extends TimedRobot {
         driver = new CommandXboxController(Constants.kDriver);
         operator = new CommandXboxController(Constants.kOperator);
 
+
+        // configureChooser();
+
         // Create triggers
-        // RobotModeTriggers.autonomous().whileTrue(autos.runSelectedAuto());
+        RobotModeTriggers.autonomous().whileTrue( chooser.getSelected());
         // Trigger gooseAround = driver.x().negate().and(operator.a().negate());
 
         // Setup lights
@@ -175,7 +185,27 @@ private void configureDriverBindings(){
         // m_operator.leftBumper().whileTrue(new AlgaeMoveToHome(m_algae));
         // m_operator.rightBumper().whileTrue(new SpitAlgae(m_algae));
     }
+  public void configureChooser() {
+        // autos using pathplanner
+        chooser.setDefaultOption("Do Nothing", new WaitCommand(15));
+        // m_chooser.addOption("3 CORAL AUTO", new PathPlannerAuto("3CoralAuto"));
+        // m_chooser.addOption("Test", new PathPlannerAuto("Startpos1 l4 coral"));
 
+        chooser.addOption("Dump L1 R BLUE", new PathPlannerAuto("DumpL1 R BLU"));
+        chooser.addOption("Dump L1 M BLUE", new PathPlannerAuto("DumpL1 M BLU"));
+        chooser.addOption("Dump L1 L BLUE", new PathPlannerAuto("DumpL1 L BLU"));
+
+        chooser.addOption("Dump L1 L RED", new PathPlannerAuto("DumpL1 L RED"));
+        chooser.addOption("Dump L1 R RED", new PathPlannerAuto("DumpL1 R RED"));
+        chooser.addOption("Dump L1 M RED", new PathPlannerAuto("DumpL1 M RED"));
+
+        chooser.addOption("Coral L4 M RED", new PathPlannerAuto("Score L4 M"));
+        chooser.addOption("Coral L4 M BLU", new PathPlannerAuto("Score L4 M BLU"));
+
+        chooser.addOption("MoveForward RED",new PathPlannerAuto("MoveForward RED"));
+        chooser.addOption("MoveForward BLUE",new PathPlannerAuto("MoveForward BLU"));
+
+      }
 
     /**
      * Returns the current match time in seconds.

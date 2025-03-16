@@ -47,7 +47,7 @@ public final class VisionManager {
     private VisionManager() {
         aprilTags = AprilTagFieldLayout.loadField(kField);
         cameras = new Camera[] {
-            new Camera("middle", Cameras.kMiddle),
+            // new Camera("middle", Cameras.kMiddle),
             new Camera("left", Cameras.kLeft),
             new Camera("right", Cameras.kRight)
         };
