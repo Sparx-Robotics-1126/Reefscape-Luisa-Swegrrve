@@ -20,6 +20,7 @@ public class LEDStrip {
         led.setLength(ledCount);
         led.setData(ledBuffer);
         led.start(); 
+
     }
     
     public AddressableLEDBuffer getLedBuffer() {

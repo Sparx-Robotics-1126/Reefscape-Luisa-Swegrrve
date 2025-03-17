@@ -89,7 +89,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         .setMechanicalProperties(6.12, 21.4285714286, 0.0, Units.inchesToMeters(4.0))
         .setOdometryStd(0.1, 0.1, 0.1)
         .setIMU(SwerveIMUs.canandgyro(RobotMap.kCanandgyro))
-        .setPhoenixFeatures(new CANBus(RobotMap.kSwerveCANBus), true, true, true)
+        // .setPhoenixFeatures(new CANBus(RobotMap.kSwerveCANBus), false, true, true)
         .setModules(kFrontLeft, kFrontRight, kBackLeft, kBackRight);
 
     private static final TunableDouble kTurboSpin = Tunable.doubleValue("swerve/kTurboSpin", 8.0);

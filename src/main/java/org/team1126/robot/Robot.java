@@ -27,6 +27,7 @@ import org.team1126.lib.util.Tunable;
 import org.team1126.robot.Constants.ArmConstants;
 // import org.team1126.robot.commands.Autos;
 import org.team1126.robot.commands.Routines;
+import org.team1126.robot.commands.LED.RainbowCommand;
 import org.team1126.robot.commands.LED.ReefLights;
 import org.team1126.robot.commands.LED.TeamLights;
 import org.team1126.robot.commands.arm.ControllerMoveArm;
@@ -71,6 +72,9 @@ public final class Robot extends TimedRobot {
     private final CommandXboxController driver;
     private final CommandXboxController operator;
     final static SendableChooser<Command> chooser = new SendableChooser<>();
+     private TeamLights lights;// = new TeamLights(this.leds);
+  private RainbowCommand rainbow;// = new RainbowCommand(this.leds);
+
     
 
     public Robot() {
@@ -93,6 +97,9 @@ public final class Robot extends TimedRobot {
         // lights = new Lights(); //TODO: May need to change
         swerve = new Swerve();
         
+        lights = new TeamLights(this.leds);
+         rainbow = new RainbowCommand(this.leds);
+
         // Initialize helpers
         selection = new ReefSelection();
 
@@ -114,9 +121,9 @@ public final class Robot extends TimedRobot {
         // Setup lights
         // lights.disabled().until(this::isEnabled).schedule();
         //TODO: Revisit
-        // RobotModeTriggers.disabled().whileTrue(lights.disabled());
-        // RobotModeTriggers.autonomous().whileTrue(lights.sides.flames());
-        // RobotModeTriggers.teleop().whileTrue(lights.sides.levelSelection(selection));
+        RobotModeTriggers.disabled().whileTrue(lights);
+        RobotModeTriggers.autonomous().whileTrue(rainbow);
+        RobotModeTriggers.teleop().whileTrue(lights);
 
         //TODO:  Look into this
         // new Trigger(this::isEnabled)
@@ -125,7 +132,7 @@ public final class Robot extends TimedRobot {
         //     .onFalse(lights.top.scored().onlyIf(this::isEnabled));
 
         // Set default commands
-         leds.setDefaultCommand(new TeamLights(leds));
+        //  leds.setDefaultCommand(new TeamLights(leds));
         extension.setDefaultCommand(new MoveExtHome(extension, .05));
         arm.setDefaultCommand(new ControllerMoveArm(()-> operator.getRawAxis(XboxController.Axis.kLeftY.value), arm));
         swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));

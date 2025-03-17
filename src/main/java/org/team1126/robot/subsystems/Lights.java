@@ -4,6 +4,8 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,6 +28,8 @@ public final class Lights {
         kGoose(255, 255, 255),
         kScored(0, 255, 0),
         kDisabled(255, 18, 0),
+        kRedAlliance(255, 0, 0),
+        kBlueAlliance(0, 0, 255),
         kOff(0, 0, 0);
 
         private final TunableInteger r;
@@ -60,6 +64,8 @@ public final class Lights {
     private final AddressableLED lights;
     private final AddressableLEDBuffer buffer;
 
+    private int chaseIndex = 0;
+
     public Lights() {
         lights = new AddressableLED(RioIO.kLights);
         buffer = new AddressableLEDBuffer(kStripLength * kStripCount);
@@ -89,10 +95,23 @@ public final class Lights {
      * Displays the disabled animation.
      */
     public Command disabled() {
-        return Commands.startEnd(() -> setAll(Color.kDisabled), () -> setAll(Color.kOff), sides, top)
-            .ignoringDisable(true)
-            .withName("Lights.disabled()");
+                if(DriverStation.getAlliance().get() == Alliance.Blue) {
+                    return Commands.startEnd(() -> setAll(Color.kBlueAlliance), () -> setAll(Color.kOff), sides, top)
+                    .ignoringDisable(true)
+                    .withName("Lights.disabled()");
+                } else {
+                    return Commands.startEnd(() -> setAll(Color.kRedAlliance), () -> setAll(Color.kOff), sides, top)
+                    .ignoringDisable(true)
+                    .withName("Lights.disabled()");
+                }
+
+
+        
+        // return Commands.startEnd(() -> setAll(color), () -> setAll(Color.kOff), sides, top)
+        //     .ignoringDisable(true)
+        //     .withName("Lights.disabled()");
     }
+
 
     @Logged
     public final class Sides extends GRRSubsystem {
@@ -178,7 +197,21 @@ public final class Lights {
                 .ignoringDisable(true)
                 .withName("Lights.Sides.levelSelection()");
         }
-
+        
+        public Command rainbowChase() {
+            return commandBuilder()
+                .onExecute(() -> {
+                    for (int i = 0; i < buffer.getLength(); i++) {
+                        final int hue = (i * 180 / buffer.getLength() + chaseIndex) % 180;
+                        buffer.setHSV(i, hue, 255, 128);
+                    }
+                    chaseIndex = (chaseIndex + 1) % 180;
+                    update();
+                })
+                .onEnd(() -> setBoth(Color.kOff))
+                .ignoringDisable(true)
+                .withName("Lights.Sides.rainbowChase()");
+        }
         /**
          * Displays the flames animation.
          */
