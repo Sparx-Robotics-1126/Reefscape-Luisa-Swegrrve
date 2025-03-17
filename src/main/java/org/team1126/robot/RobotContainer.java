@@ -32,6 +32,7 @@
 // import org.team1126.robot.commands.LED.RainbowCommand;
 // import org.team1126.robot.commands.LED.ReefLights;
 // import org.team1126.robot.commands.LED.TeamLights;
+// import org.team1126.robot.commands.arm.ControllerMoveArm;
 // // import frc.robot.commands.subsystems.algaeAcq.AlgaeMoveToHome;
 // // import frc.robot.commands.subsystems.algaeAcq.AlgaeMoveToPosition;
 // // import frc.robot.commands.subsystems.algaeAcq.SpitAlgae;
@@ -64,29 +65,29 @@
 //  */
 // public class RobotContainer {
 
-//     public static final ArmSubsystem m_arm = new ArmSubsystem();
+//     // public static final ArmSubsystem m_arm = new ArmSubsystem();
     
-//     public static final ExtensionSubsystem m_extension = new ExtensionSubsystem();
+//     // public static final ExtensionSubsystem m_extension = new ExtensionSubsystem();
     
 //     // public static final AlgaeAcquisition m_algae = new AlgaeAcquisition();
 
-//     public static final ClimbSubsystem m_climb = new ClimbSubsystem();
+//     // public static final ClimbSubsystem m_climb = new ClimbSubsystem();
 
-//     public static final PlacerSubsystem m_placer = new PlacerSubsystem();
+//     // public static final PlacerSubsystem m_placer = new PlacerSubsystem();
 
-//     public static CommandXboxController m_driver = new CommandXboxController(0);
-//     public static CommandXboxController m_operator = new CommandXboxController(1);
+//     public static CommandXboxController driver = new CommandXboxController(0);
+//     // public static CommandXboxController m_operator = new CommandXboxController(1);
 
-//     public static final LEDs ledSubsystem = new LEDs(0, 200); //PORT IS PWM!!!
+//     // public static final LEDs ledSubsystem = new LEDs(0, 200); //PORT IS PWM!!!
 
-//     public static HttpCamera colorCamera;
+//     // public static HttpCamera colorCamera;
 
-//     final static SendableChooser<Command> m_chooser = new SendableChooser<>();
+//     // final static SendableChooser<Command> m_chooser = new SendableChooser<>();
     
 //   // The robot's subsystems and commands are defined here...
-//   final static Swerve swerve ;// = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-//                                                                                 "swerve/neo"));
-
+// //   final static Swerve swerve ;// = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+// //                                                                                 "swerve/neo"));
+// public final Swerve swerve;
 //   /**
 //    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
 //    */
@@ -152,212 +153,44 @@
 //     swerve = new Swerve();
 
 
-//     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+//     // NamedCommands.registerCommand("test", Commands.print("I EXIST"));
 
-//             configurePathPlanner();
+//             // configurePathPlanner();
 
-//             colorCamera = new HttpCamera("Color Camera", "http://10.11.26.11");
+//             // colorCamera = new HttpCamera("Color Camera", "http://10.11.26.11");
 
 //         // human control for climb and algae
 
 //         // m_climb.setDefaultCommand(new ClimbMoveArm(()-> m_operator.getRawAxis(XboxController.Axis.kLeftX.value), m_climb));
-//         m_arm.setDefaultCommand(new ControllerMoveArm(()-> m_operator.getRawAxis(XboxController.Axis.kLeftY.value), m_arm));
-//          //m_extension.setDefaultCommand(new ControllerMoveExtension(()-> m_operator.getRawAxis(XboxController.Axis.kRightY.value), m_extension));
-//         m_extension.setDefaultCommand(new MoveExtHome(m_extension, .05));
+//         // m_arm.setDefaultCommand(new ControllerMoveArm(()-> m_operator.getRawAxis(XboxController.Axis.kLeftY.value), m_arm));
+//         //  //m_extension.setDefaultCommand(new ControllerMoveExtension(()-> m_operator.getRawAxis(XboxController.Axis.kRightY.value), m_extension));
+//         // m_extension.setDefaultCommand(new MoveExtHome(m_extension, .05));
 
-//         ledSubsystem.setDefaultCommand(new TeamLights(ledSubsystem));
+//         // ledSubsystem.setDefaultCommand(new TeamLights(ledSubsystem));
 
 //         // m_placer.setDefaultCommand(new AnalogPlacer(()-> m_operator.getRawAxis(XboxController.Axis.kLeftY.value), m_placer));
 
 //         // m_algae.setDefaultCommand(new MoveAlgae(m_algae, () -> m_operator.getRawAxis(XboxController.Axis.kRightY.value)));
        
-//         configureChooser();
+//         // configureChooser();
 
-//         configureDriverBindings();
-//         configureOperatorBindings();
+//         // configureOperatorBindings();
+//         swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));
 //         DriverStation.silenceJoystickConnectionWarning(true);
 //   }
 
-//   /**
-//    * Use this method to define your trigger->command mappings. Triggers can be created via the
-//    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the
-//    * named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-//    * {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4}
-//    * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
-//    */
-//   private void configureDriverBindings()
-//   {
-//     //Command driveFieldOrientedDirectAngle      = m_swerve.driveFieldOriented(driveDirectAngle);
-//     Command driveFieldOrientedAnglularVelocity = m_swerve.driveFieldOriented(driveAngularVelocity);
-//     // Command driveRobotOrientedAngularVelocity  = m_swerve.driveFieldOriented(driveRobotOriented);
-//     // Command driveSetpointGen = m_swerve.driveWithSetpointGeneratorFieldRelative(
-//     //    driveDirectAngle);
-//     Command driveFieldOrientedDirectAngleKeyboard      = m_swerve.driveFieldOriented(driveDirectAngleKeyboard);
-//     // Command driveFieldOrientedAnglularVelocityKeyboard = m_swerve.driveFieldOriented(driveAngularVelocityKeyboard);
-//     // Command driveSetpointGenKeyboard = m_swerve.driveWithSetpointGeneratorFieldRelative(
-//     //     driveDirectAngleKeyboard);
-
-//     if (RobotBase.isSimulation())
-//     {
-//       m_swerve.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
-//     } else
-//     {
-//       m_swerve.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+//     public double driverX() {
+//         return driver.getLeftX();
 //     }
 
-//     if (Robot.isSimulation())
-//     {
-//       Pose2d target = new Pose2d(new Translation2d(1, 4),
-//                                  Rotation2d.fromDegrees(90));
-//       //m_swerve.getSwerveDrive().field.getObject("targetPose").setPose(target);
-//       driveDirectAngleKeyboard.driveToPose(() -> target,
-//                                            new ProfiledPIDController(5,
-//                                                                      0,
-//                                                                      0,
-//                                                                      new Constraints(5, 2)),
-//                                            new ProfiledPIDController(5,
-//                                                                      0,
-//                                                                      0,
-//                                                                      new Constraints(Units.degreesToRadians(360),
-//                                                                                      Units.degreesToRadians(180))
-//                                            ));
-//       m_driver.start().onTrue(Commands.runOnce(() -> m_swerve.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-//       m_driver.button(1).whileTrue(m_swerve.sysIdDriveMotorCommand());
-//       m_driver.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
-//                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
-
-// //      m_driver.b().whileTrue(
-// //          m_swerve.driveToPose(
-// //              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-// //                              );
-
-//     }
-//     if (DriverStation.isTest())
-//     {
-//       m_swerve.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
-
-//       m_driver.x().whileTrue(Commands.runOnce(m_swerve::lock, m_swerve).repeatedly());
-//       m_driver.y().whileTrue(m_swerve.driveToDistanceCommand(1.0, 0.2));
-//       m_driver.start().onTrue((Commands.runOnce(m_swerve::zeroGyro)));
-//       m_driver.back().whileTrue(m_swerve.centerModulesCommand());
-//       m_driver.leftBumper().onTrue(Commands.none());
-//       m_driver.rightBumper().onTrue(Commands.none());
-//     } else
-//     {
-//        m_driver.leftTrigger().onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
-//             // m_driver.leftTrigger().onChange(new InstantCommand(() -> m_swerve.zeroGyroWithAlliance()));
-//             m_driver.a().onTrue((Commands.runOnce(m_swerve::zeroGyro)));
-//             m_driver.y().whileTrue(new ClimbMoveToPos(m_climb, 0));
-//             m_driver.x().whileTrue(new ClimbMoveToPos(m_climb, 125));
-//             m_driver.b().whileTrue(new ClimbMoveToPos(m_climb, -112.55));
-//             // m_driver.leftBumper().whileTrue(new DriveToClosestLeftBranchPoseCommand(m_swerve));  
-//             // m_driver.leftBumper().whileTrue(m_swerve.driveToPose(m_swerve.getClosestLeftBranchPose()));
-//             m_driver.leftBumper().whileTrue(m_swerve.driveToPose(AprilTagPositions.APRILTAGS_BLU[0]));
-//             m_driver.rightBumper().whileTrue(m_swerve.driveToPose(m_swerve.getClosestRightBranchPose()));
-
-
-//       // m_driver.a().onTrue((Commands.runOnce(m_swerve::zeroGyro)));
-//       // m_driver.x().onTrue(Commands.runOnce(m_swerve::addFakeVisionReading));
-//       // m_driver.start().whileTrue(Commands.none());
-//       // m_driver.back().whileTrue(Commands.none());
-//       // // m_driver.leftBumper().whileTrue(Commands.runOnce(m_swerve::lock, m_swerve).repeatedly());
-//       // m_driver.rightBumper().onTrue(Commands.none());
-//       // m_driver.leftBumper().whileTrue(m_swerve.driveToPose(new Pose2d(3.074, 4.021, Rotation2d.fromDegrees(0.0))));
-
-
+//     public double driverY() {
+//         return driver.getLeftY();
 //     }
 
-//   }
-
-//       public void configureOperatorBindings() {   
-
-//         m_operator.povDown().whileTrue(new MoveArmToAngle(m_arm, 0).alongWith(new MoveExtensionToPos(m_extension, m_arm, 0.01))); //arm home
-//         m_operator.povUp().whileTrue(new MoveArmToAngle(m_arm, 18.442849922180176).alongWith(new MoveExtensionToPos(m_extension, m_arm, .01))
-//                   .alongWith(new IngestCoral(m_placer, -.5)).andThen(new PositionCoral(m_placer)));                                                    //arm to coral station
-
-//         m_operator.a().whileTrue(new MoveArmToAngle(m_arm, ArmConstants.L1_ARM_POS).alongWith(new MoveExtensionToPos(m_extension, m_arm, 0.013659)).alongWith(new ReefLights(ledSubsystem, true, 1))); //arm l1
-//         m_operator.x().whileTrue(new MoveArmToAngle(m_arm, ArmConstants.L2_ARM_POS).alongWith(new MoveExtensionToPos(m_extension, m_arm,-0.0831989)).alongWith(new ReefLights(ledSubsystem, true, 2))); //arm l2
-//         m_operator.b().whileTrue(new MoveArmToAngle(m_arm,  ArmConstants.L3_ARM_POS).alongWith(new MoveExtensionToPos(m_extension, m_arm, -0.25)).alongWith(new ReefLights(ledSubsystem, true, 3))); //arm l3
-//         m_operator.y().whileTrue(new MoveArmToAngle(m_arm, ArmConstants.L4_ARM_POS).alongWith(new MoveExtensionToPos(m_extension, m_arm, -0.55)).alongWith(new ReefLights(ledSubsystem, true, 4))); //arm l4
-
-//         m_operator.rightTrigger(0.1).whileTrue(new AnalogPlacer(() -> m_operator.getRawAxis(XboxController.Axis.kRightTrigger.value), m_placer,false));
-//         m_operator.leftTrigger(0.1).whileTrue(new AnalogPlacer(() -> m_operator.getRawAxis(XboxController.Axis.kLeftTrigger.value), m_placer,true));
-//         // m_operator.povRight().whileTrue(new AlgaeMoveToPosition(m_algae, 40));
-//         // m_operator.leftBumper().whileTrue(new AlgaeMoveToHome(m_algae));
-//         // m_operator.rightBumper().whileTrue(new SpitAlgae(m_algae));
+//     public double driverAngular() {
+//         return driver.getLeftTriggerAxis() - driver.getRightTriggerAxis();
 //     }
 
-//       public void configureChooser() {
-//         // autos using pathplanner
-//         m_chooser.setDefaultOption("Do Nothing", new WaitCommand(15));
-//         // m_chooser.addOption("3 CORAL AUTO", new PathPlannerAuto("3CoralAuto"));
-//         // m_chooser.addOption("Test", new PathPlannerAuto("Startpos1 l4 coral"));
-
-//           m_chooser.addOption("Dump L1 R BLUE", new PathPlannerAuto("DumpL1 R BLU"));
-//           m_chooser.addOption("Dump L1 M BLUE", new PathPlannerAuto("DumpL1 M BLU"));
-//           m_chooser.addOption("Dump L1 L BLUE", new PathPlannerAuto("DumpL1 L BLU"));
-
-//           m_chooser.addOption("Dump L1 L RED", new PathPlannerAuto("DumpL1 L RED"));
-//           m_chooser.addOption("Dump L1 R RED", new PathPlannerAuto("DumpL1 R RED"));
-//           m_chooser.addOption("Dump L1 M RED", new PathPlannerAuto("DumpL1 M RED"));
-
-//           m_chooser.addOption("Coral L4 M RED", new PathPlannerAuto("Score L4 M"));
-//           m_chooser.addOption("Coral L4 M BLU", new PathPlannerAuto("Score L4 M BLU"));
-
-//         m_chooser.addOption("MoveForward RED",new PathPlannerAuto("MoveForward RED"));
-//         m_chooser.addOption("MoveForward BLUE",new PathPlannerAuto("MoveForward BLU"));
-
-//       }
-
-//    /* REGISTER PATHPLANNER COMMANDS HERE */
-//     public void configurePathPlanner() {
-        
-//         NamedCommands.registerCommand("Wait", new WaitCommand(1));
-
-//         NamedCommands.registerCommand("MoveArmToHome",new MoveArmToAngle(m_arm, -.01).withTimeout(1));
-//         NamedCommands.registerCommand("MoveExtensionToHome", new MoveExtHome(m_extension, -0.01).withTimeout(1));
-
-//         NamedCommands.registerCommand("MoveArmToCoral", new MoveArmToAngle(m_arm, 17.642849922180176).withTimeout(1));
-//         NamedCommands.registerCommand("MoveExtensionToCoral", new MoveExtensionToPos(m_extension, m_arm, .01).withTimeout(1));
-//         NamedCommands.registerCommand("AcquireCoral", new IngestCoral(m_placer,-.35).andThen(new PositionCoral(m_placer)));
-
-//         NamedCommands.registerCommand("MoveArmToL1",new MoveArmToAngle(m_arm, 11.76196).withTimeout(1));
-//         NamedCommands.registerCommand("MoveArmToL2", new MoveArmToAngle(m_arm, 22.238).withTimeout(1));
-//         NamedCommands.registerCommand("MoveArmToL3", new MoveArmToAngle(m_arm,  26.5).withTimeout(1));
-//         NamedCommands.registerCommand("MoveArmToL4", new MoveArmToAngle(m_arm, 33.5).withTimeout(1));
-
-//         NamedCommands.registerCommand("MoveExtensionToL1", new MoveExtensionToPos(m_extension,m_arm, 0.013659).withTimeout(1));
-//         NamedCommands.registerCommand("MoveExtensionToL2", new MoveExtensionToPos(m_extension, m_arm,-0.0831989).withTimeout(1));
-//         NamedCommands.registerCommand("MoveExtensionToL3", new MoveExtensionToPos(m_extension, m_arm,-0.25).withTimeout(1));
-//         NamedCommands.registerCommand("MoveExtensionToL4", new MoveExtensionToPos(m_extension, m_arm, -0.55).withTimeout(2));
 
 
-//         NamedCommands.registerCommand("SpinPlacerOut", new PlaceCoral(m_placer, 0.5).withTimeout(1));
-//         NamedCommands.registerCommand("SlowPlacer", new PlaceCoral(m_placer, 0.3).withTimeout(1));
-//         NamedCommands.registerCommand("SpinPlacerIn",new AcquireCoral(m_placer).withTimeout(1));
-
-//         NamedCommands.registerCommand("IngestCoral", new IngestCoral(m_placer,-.15));
-//         NamedCommands.registerCommand("PositionCoral", new PositionCoral(m_placer));
-
-//         // NamedCommands.registerCommand("MovetoPos", new InstantCommand(() -> m_swerve.moveToPosition) );  
-//          }
-
-//   /**
-//    * Use this to pass the autonomous command to the main {@link Robot} class.
-//    *
-//    * @return the command to run in autonomous
-//    */
-//   public Command getAutonomousCommand()
-//   {
-//     // An example command will be run in autonomous
-//     //return m_swerve.getAutonomousCommand("New Auto");
-
-//     return m_chooser.getSelected();
-//   }
-
-//   public void setMotorBrake(boolean brake)
-//   {
-//     m_swerve.setMotorBrake(brake);
-//   }
-  
 // }

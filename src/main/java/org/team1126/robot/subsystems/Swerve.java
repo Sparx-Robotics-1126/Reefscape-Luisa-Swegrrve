@@ -80,15 +80,15 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
     private static final SwerveConfig kConfig = new SwerveConfig()
         .setTimings(TimedRobot.kDefaultPeriod, 0.004, 0.02)
         .setMovePID(0.27, 0.0, 0.0)
-        .setMoveFF(0.0, 0.126)
-        .setTurnPID(100.0, 0.0, 0.2)
+        .setMoveFF(0.0, 0.0)
+        .setTurnPID(0.0, 0.0, 0.0)
         .setBrakeMode(false, true)
         .setLimits(4.0, 0.05, 17.5, 14.0, 30.0)
         .setDriverProfile(4.0, 1.5, 0.15, 4.7, 2.0, 0.05)
         .setPowerProperties(Constants.kVoltage, 100.0, 80.0, 60.0, 60.0)
         .setMechanicalProperties(6.12, 21.4285714286, 0.0, Units.inchesToMeters(4.0))
         .setOdometryStd(0.1, 0.1, 0.1)
-        .setIMU(SwerveIMUs.canandgyro(RobotMap.kCanandgyro))
+        .setIMU(SwerveIMUs.pigeon2(RobotMap.kCanandgyro))
         // .setPhoenixFeatures(new CANBus(RobotMap.kSwerveCANBus), false, true, true)
         .setModules(kFrontLeft, kFrontRight, kBackLeft, kBackRight);
 
@@ -149,7 +149,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         api.refresh();
 
         // Apply vision estimates to the pose estimator.
-        api.addVisionMeasurements(vision.getUnreadResults(state.imu.yawMeasurements));
+        // api.addVisionMeasurements(vision.getUnreadResults(state.imu.yawMeasurements));
 
         // Calculate helpers
         Translation2d reefCenter = Alliance.isBlue() ? FieldConstants.kReefCenterBlue : FieldConstants.kReefCenterRed;

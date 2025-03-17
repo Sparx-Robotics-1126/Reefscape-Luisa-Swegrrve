@@ -1,6 +1,8 @@
 package org.team1126.robot.commands.arm;
 
 import edu.wpi.first.wpilibj2.command.Command;
+
+import org.team1126.robot.Robot;
 // import org.team1126.robot.RobotContainer;
 import org.team1126.robot.subsystems.ExtensionSubsystem;
 
@@ -10,7 +12,7 @@ public class MoveExtHome extends Command {
    private double targetExtension;
 
    public MoveExtHome(ExtensionSubsystem extension, double pos) {
-    //    addRequirements(RobotContainer.m_extension);
+    //    addRequirements(Robot.e);
        this.extension = extension;
        targetExtension = pos;
    }

@@ -99,7 +99,7 @@ public static final class CoralConstants {
 
     public static final class RobotMap {
 
-        public static final String kSwerveCANBus = "LowerCAN";
+        public static final String kSwerveCANBus = "rio";
 
         public static final int kFlMove = 2;
         public static final int kFlTurn = 3;
