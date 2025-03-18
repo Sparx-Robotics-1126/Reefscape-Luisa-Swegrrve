@@ -38,8 +38,8 @@ public final class Robot extends TimedRobot {
 
     public Robot() {
         DriverStation.silenceJoystickConnectionWarning(true);
-        DisableWatchdog.in(scheduler, "m_watchdog");
-        DisableWatchdog.in(this, "m_watchdog");
+        // DisableWatchdog.in(scheduler, "m_watchdog");
+        // DisableWatchdog.in(this, "m_watchdog");
 
         // Configure logging
         DataLogManager.start();
@@ -89,7 +89,7 @@ public final class Robot extends TimedRobot {
 
     @NotLogged
     public double driverAngular() {
-        return driver.getLeftTriggerAxis() - driver.getRightTriggerAxis();
+        return driver.getRightX();
     }
 
     @Override
@@ -97,7 +97,7 @@ public final class Robot extends TimedRobot {
         Profiler.start("robotPeriodic");
         Profiler.run("scheduler", scheduler::run);
         // Profiler.run("lights", lights::update);
-        // Profiler.run("epilogue", () -> Epilogue.update(this));
+        Profiler.run("epilogue", () -> Epilogue.update(this));
         Profiler.run("tunables", Tunable::update);
         Profiler.end();
     }

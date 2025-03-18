@@ -54,34 +54,34 @@ public final class Swerve extends GRRSubsystem {
     .setLocation(kModuleOffset, kModuleOffset)
     .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kFlMove, true))
     .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kFlTurn, true))
-    .setEncoder(SwerveEncoders.canCoder(RobotMap.kFlEncoder, 110.947403125, false));
+    .setEncoder(SwerveEncoders.canCoder(RobotMap.kFlEncoder, -0.290283, false));
 
 private static final SwerveModuleConfig kFrontRight = new SwerveModuleConfig()
     .setName("frontRight")
     .setLocation(kModuleOffset, -kModuleOffset)
     .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kFrMove, true))
     .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kFrTurn, true))
-    .setEncoder(SwerveEncoders.canCoder(RobotMap.kFrEncoder, 37.354, false));
+    .setEncoder(SwerveEncoders.canCoder(RobotMap.kFrEncoder, -0.096924, false));
 
 private static final SwerveModuleConfig kBackLeft = new SwerveModuleConfig()
     .setName("backLeft")
     .setLocation(-kModuleOffset, kModuleOffset)
-    .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kBlMove, false))
+    .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kBlMove, true))
     .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kBlTurn, true))
-    .setEncoder(SwerveEncoders.canCoder(RobotMap.kBlEncoder, 53.685, false));
+    .setEncoder(SwerveEncoders.canCoder(RobotMap.kBlEncoder, 0.353760, false));
 
 private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
     .setName("backRight")
     .setLocation(-kModuleOffset, -kModuleOffset)
     .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kBrMove, true))
     .setTurnMotor(SwerveMotors.sparkMax(RobotMap.kBrTurn, true))
-    .setEncoder(SwerveEncoders.canCoder(RobotMap.kBrEncoder, 256.5, false));
+    .setEncoder(SwerveEncoders.canCoder(RobotMap.kBrEncoder, 0.311035, false));
 
     private static final SwerveConfig kConfig = new SwerveConfig()
         .setTimings(TimedRobot.kDefaultPeriod, 0.004, 0.02)
-        .setMovePID(0.27, 0.0, 0.0)
-        .setMoveFF(0.0, 0.0)
-        .setTurnPID(0.0, 0.0, 0.0)
+        .setMovePID(0.015, 0.0, 0.0)
+        .setMoveFF(0.05, 0.128)
+        .setTurnPID(1.0, 0.0, 0.2)
         .setBrakeMode(false, true)
         .setLimits(4.0, 0.05, 17.5, 14.0, 30.0)
         .setDriverProfile(4.0, 1.5, 0.15, 4.7, 2.0, 0.05)
