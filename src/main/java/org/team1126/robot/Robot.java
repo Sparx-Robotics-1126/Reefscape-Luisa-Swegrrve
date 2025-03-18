@@ -19,6 +19,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.team1126.lib.util.DisableWatchdog;
 import org.team1126.lib.util.Profiler;
 import org.team1126.lib.util.Tunable;
+import org.team1126.robot.commands.Autos;
+import org.team1126.robot.subsystems.ArmSubsystem;
+import org.team1126.robot.subsystems.ClimbSubsystem;
+import org.team1126.robot.subsystems.ExtensionSubsystem;
+import org.team1126.robot.subsystems.PlacerSubsystem;
 import org.team1126.robot.subsystems.Swerve;
 import org.team1126.robot.util.ReefSelection;
 
@@ -29,11 +34,16 @@ public final class Robot extends TimedRobot {
 
     
     public final Swerve swerve;
-
+    public final ClimbSubsystem climber;
+    public final ExtensionSubsystem extension;
+    public final ArmSubsystem arm;
+    public final PlacerSubsystem placer;
+    public final Autos autos;
     // public final ReefSelection selection;
 
 
     private final CommandXboxController driver;
+    private final CommandXboxController operator;
     // private final CommandXboxController coDriver;
 
     public Robot() {
@@ -48,17 +58,23 @@ public final class Robot extends TimedRobot {
         Epilogue.getConfig().root = "/Telemetry";
 
         // Initialize subsystems
-       
+        climber = new ClimbSubsystem();
+        extension = new ExtensionSubsystem();
+        arm = new ArmSubsystem();
+        placer = new PlacerSubsystem();
         swerve = new Swerve();
 
         // Initialize controllers
         driver = new CommandXboxController(Constants.kDriver);
-        
+        operator = new CommandXboxController(Constants.kOperator);
         
         swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));
 
+        autos = new Autos(this);
         // Driver bindings
-       
+         // Create triggers
+        RobotModeTriggers.autonomous().whileTrue(autos.runSelectedAuto());
+        
         driver.x().onTrue(none()); // Reserved (No goosing around)
         driver.y().onTrue(none()); // Reserved (Force goose spit)
 
