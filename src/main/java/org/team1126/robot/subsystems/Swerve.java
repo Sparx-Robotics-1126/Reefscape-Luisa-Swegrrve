@@ -127,8 +127,8 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         state = api.state;
         vision = VisionManager.getInstance();
 
-        autoPIDx = new PIDController(10.0, 0.0, 0.0);
-        autoPIDy = new PIDController(10.0, 0.0, 0.0);
+        autoPIDx = new PIDController(1.0, 0.0, 0.0);
+        autoPIDy = new PIDController(1.0, 0.0, 0.0);
         autoPIDangular = new PIDController(10.0, 0.0, 0.0);
         autoPIDangular.enableContinuousInput(-Math.PI, Math.PI);
 

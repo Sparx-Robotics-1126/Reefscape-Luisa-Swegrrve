@@ -11,7 +11,10 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -19,10 +22,22 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.team1126.lib.util.DisableWatchdog;
 import org.team1126.lib.util.Profiler;
 import org.team1126.lib.util.Tunable;
+import org.team1126.robot.Constants.AprilTagPositions;
+import org.team1126.robot.Constants.ArmConstants;
 import org.team1126.robot.commands.Autos;
+import org.team1126.robot.commands.LED.RainbowCommand;
+import org.team1126.robot.commands.LED.ReefLights;
+import org.team1126.robot.commands.LED.TeamLights;
+import org.team1126.robot.commands.arm.MoveArmToAngle;
+import org.team1126.robot.commands.arm.MoveExtensionToPos;
+import org.team1126.robot.commands.climb.ClimbMoveToPos;
+import org.team1126.robot.commands.placer.AnalogPlacer;
+import org.team1126.robot.commands.placer.IngestCoral;
+import org.team1126.robot.commands.placer.PositionCoral;
 import org.team1126.robot.subsystems.ArmSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem;
 import org.team1126.robot.subsystems.ExtensionSubsystem;
+import org.team1126.robot.subsystems.LEDs;
 import org.team1126.robot.subsystems.PlacerSubsystem;
 import org.team1126.robot.subsystems.Swerve;
 import org.team1126.robot.util.ReefSelection;
@@ -39,6 +54,7 @@ public final class Robot extends TimedRobot {
     public final ArmSubsystem arm;
     public final PlacerSubsystem placer;
     public final Autos autos;
+    public final LEDs leds;
     // public final ReefSelection selection;
 
 
@@ -63,20 +79,46 @@ public final class Robot extends TimedRobot {
         arm = new ArmSubsystem();
         placer = new PlacerSubsystem();
         swerve = new Swerve();
+        leds = new LEDs(0, 300); // PORT IS PWM!!
 
         // Initialize controllers
         driver = new CommandXboxController(Constants.kDriver);
         operator = new CommandXboxController(Constants.kOperator);
         
         swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));
+        leds.setDefaultCommand(new TeamLights(leds));
 
         autos = new Autos(this);
-        // Driver bindings
+
+        //driver.leftTrigger().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
+        //driver.a().onTrue(new InstantCommand(() -> swerve.resetPose(null)));
+        driver.y().whileTrue(new ClimbMoveToPos(climber, 0));
+        driver.x().whileTrue(new ClimbMoveToPos(climber, 125));
+        driver.b().whileTrue(new ClimbMoveToPos(climber, -112.55));
+        // driver.leftBumper().whileTrue(new DriveToClosestLeftBranchPoseCommand(swerve));  
+        // driver.leftBumper().whileTrue(swerve.driveToPose(swerve.getClosestLeftBranchPose()));
+        // driver.leftBumper().whileTrue(swerve.driveToPose(AprilTagPositions.APRILTAGS_BLU[0]));
+        // driver.rightBumper().whileTrue(swerve.driveToPose(swerve.getClosestRightBranchPose()));
+
+        // Operator bindings
+        operator.povDown().whileTrue(new MoveArmToAngle(arm, 0).alongWith(new MoveExtensionToPos(extension, arm, 0.01))); //arm home
+        operator.povUp().whileTrue(new MoveArmToAngle(arm, 18.442849922180176).alongWith(new MoveExtensionToPos(extension, arm, .01))
+                  .alongWith(new IngestCoral(placer, -.5)).andThen(new PositionCoral(placer)));                                                    //arm to coral station
+
+        operator.a().whileTrue(new MoveArmToAngle(arm, ArmConstants.L1_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, 0.013659)).alongWith(new ReefLights(leds, true, 1))); //arm l1
+        operator.x().whileTrue(new MoveArmToAngle(arm, ArmConstants.L2_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm,-0.0831989)).alongWith(new ReefLights(leds, true, 2))); //arm l2
+        operator.b().whileTrue(new MoveArmToAngle(arm,  ArmConstants.L3_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, -0.25)).alongWith(new ReefLights(leds, true, 3))); //arm l3
+        operator.y().whileTrue(new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, -0.55)).alongWith(new ReefLights(leds, true, 4))); //arm l4
+
+        operator.rightTrigger(0.1).whileTrue(new AnalogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value), placer,false));
+        operator.leftTrigger(0.1).whileTrue(new AnalogPlacer(() -> operator.getRawAxis(XboxController.Axis.kLeftTrigger.value), placer,true));
+
          // Create triggers
         RobotModeTriggers.autonomous().whileTrue(autos.runSelectedAuto());
-        
-        driver.x().onTrue(none()); // Reserved (No goosing around)
-        driver.y().onTrue(none()); // Reserved (Force goose spit)
+        RobotModeTriggers.autonomous().whileTrue(new RainbowCommand(leds));
+
+        // driver.x().onTrue(none()); // Reserved (No goosing around)
+        // driver.y().onTrue(none()); // Reserved (Force goose spit)
 
         // Set thread priority
         Threads.setCurrentThreadPriority(true, 10);

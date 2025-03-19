@@ -77,6 +77,7 @@ private AutoRoutine moveTestAutoRoutine(boolean mirror){
     .onTrue(
         sequence(
             parallel(
+                testPath.resetOdometry(),
                 swerve.resetAutoPID()
             ),
             testPath.spawnCmd()

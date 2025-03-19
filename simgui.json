@@ -12,10 +12,11 @@
       "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Pigeon 2 (v6) [14]": "Gyro",
       "/SmartDashboard/Swerve Drive": "Alerts",
+      "/SmartDashboard/autos": "String Chooser",
       "/Telemetry/scheduler": "Scheduler"
     },
     "windows": {
-      "/SmartDashboard/AUTO CHOICES ": {
+      "/SmartDashboard/autos": {
         "window": {
           "visible": true
         }
