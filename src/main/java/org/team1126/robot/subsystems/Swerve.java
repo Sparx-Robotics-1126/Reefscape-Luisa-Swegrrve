@@ -71,6 +71,7 @@ private static final SwerveModuleConfig kBackLeft = new SwerveModuleConfig()
     .setEncoder(SwerveEncoders.canCoder(RobotMap.kBlEncoder, 0.353760, false));
 
 private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
+
     .setName("backRight")
     .setLocation(-kModuleOffset, -kModuleOffset)
     .setMoveMotor(SwerveMotors.sparkMax(RobotMap.kBrMove, true))
@@ -78,15 +79,32 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
     .setEncoder(SwerveEncoders.canCoder(RobotMap.kBrEncoder, 0.311035, false));
 
     private static final SwerveConfig kConfig = new SwerveConfig()
-        .setTimings(TimedRobot.kDefaultPeriod, 0.004, 0.02)
-        .setMovePID(0.015, 0.0, 0.0)
-        .setMoveFF(0.05, 0.128)
-        .setTurnPID(0.05, 0.0, 0.2)
-        .setBrakeMode(false, true)
-        .setLimits(4.0, 0.05, 17.5, 14.0, 30.0)
-        .setDriverProfile(4.0, 1.5, 0.15, 4.7, 2.0, 0.05)
-        .setPowerProperties(Constants.kVoltage, 100.0, 80.0, 60.0, 60.0)
-        .setMechanicalProperties(6.12, 21.4285714286, 0.0, Units.inchesToMeters(4.0))
+        .setTimings(TimedRobot.kDefaultPeriod, 0.01, 0.02) 
+        
+                    // Odometry: how fast the odometry updates, lower if we need lower CAN utilization. 
+                    // Discretization: Should not be changed.
+        
+        .setMovePID(0.08, 0.0, 0.0)  //PID tuning!!!
+        .setMoveFF(0.05, 0.128)         //      |
+        .setTurnPID(0.05, 0.0, 0.2)  //      V
+        .setBrakeMode(false, true)  // Think about turning move to false for testing?
+        .setLimits(4.5, 0.05, 17.5, 14.0, 30.0) 
+
+                    // Velocity: the max speed the MOTORS are able to go. please don't change this.
+                    // VelDeadband: how much deadband is needed on the controller to start moving. 
+                    // SlipAccel: the amount of acceleration the robot can do. the higher the number, the snappier the chnage in direction will be
+                    // TorqueAccel: the amount to correct for rotating while at full speed. the higher the number, the more correction.
+
+        .setDriverProfile(4.3, 1.5, 0.15, 4.7, 2.0, 0.15) 
+
+                    // Vel: the max velocity the HUMAN PLAYER can give to the robot.
+                    // velExp: the exponential given to the joystick to allow for more sensitive control
+                    // velDeadband: self-explanitory
+                    // angularVel: limits the angular velocity so that we dont overuse motors
+                    // angularVelDeadband: also self-explanatory
+
+        .setPowerProperties(Constants.kVoltage, 60.0, 60.0, 60.0, 60.0)
+        .setMechanicalProperties(6.12, 21.4285714286, 0.0, Units.inchesToMeters(3.74))
         .setOdometryStd(0.1, 0.1, 0.1)
         .setIMU(SwerveIMUs.pigeon2(RobotMap.kCanandgyro))
         // .setPhoenixFeatures(new CANBus(RobotMap.kSwerveCANBus), false, true, true)
@@ -98,6 +116,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
     private static final TunableDouble kBeachTolerance = Tunable.doubleValue("swerve/kBeachTolerance", 0.15);
 
     private static final TunableDouble kReefAssistKp = Tunable.doubleValue("swerve/kReefAssistKp", 15.0);
+    private static final TunableDouble kAutoDriveTolerance = Tunable.doubleValue("swerve/kAutoDriveTolerance", 0.3);
     private static final TunableDouble kReefAssistTolerance = Tunable.doubleValue("swerve/kReefAssistTolerance", 1.3);
     private static final TunableDouble kFacingReefTolerance = Tunable.doubleValue("swerve/kFacingReefTolerance", 1.0);
     private static final TunableDouble kReefDangerDistance = Tunable.doubleValue("swerve/kReefDangerDistance", 0.6);
@@ -109,6 +128,9 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
 
     private final PIDController autoPIDx;
     private final PIDController autoPIDy;
+    public final PIDController reefPIDx;
+    public final PIDController reefPIDy;
+    
     private final PIDController autoPIDangular;
 
     private final ProfiledPIDController angularPID;
@@ -127,8 +149,11 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         state = api.state;
         vision = VisionManager.getInstance();
 
-        autoPIDx = new PIDController(1.0, 0.0, 0.0);
-        autoPIDy = new PIDController(1.0, 0.0, 0.0);
+        reefPIDx = new PIDController(7.0, 0.0, 0.0);
+        reefPIDy = new PIDController(7.0, 0.0, 0.0);
+
+        autoPIDx = new PIDController(15.0, 0.0, 0.0);
+        autoPIDy = new PIDController(15.0, 0.0, 0.0);
         autoPIDangular = new PIDController(10.0, 0.0, 0.0);
         autoPIDangular.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -141,6 +166,8 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         Tunable.pidController("swerve/autoPID", autoPIDy);
         Tunable.pidController("swerve/autoPIDangular", autoPIDangular);
         Tunable.pidController("swerve/angularPID", angularPID);
+        Tunable.pidController("swerve/reefPID",reefPIDx);
+        Tunable.pidController("swerve/reefPID",reefPIDy);
     }
 
     @Override
@@ -149,7 +176,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         api.refresh();
 
         // Apply vision estimates to the pose estimator.
-        // api.addVisionMeasurements(vision.getUnreadResults(state.imu.yawMeasurements));
+        api.addVisionMeasurements(vision.getUnreadResults(state.imu.yawMeasurements));
 
         // Calculate helpers
         Translation2d reefCenter = Alliance.isBlue() ? FieldConstants.kReefCenterBlue : FieldConstants.kReefCenterRed;
@@ -282,12 +309,9 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
      *             the left reef pole, or {@code false} to target the right pole.
      */
     public Command driveReef(DoubleSupplier x, DoubleSupplier y, DoubleSupplier angular, BooleanSupplier left) {
-        Mutable<Boolean> exitLock = new Mutable<>(false);
-
         return commandBuilder("Swerve.driveReef()")
             .onInitialize(() -> {
                 angularPID.reset(state.rotation.getRadians(), state.speeds.omegaRadiansPerSecond);
-                exitLock.value = false;
             })
             .onExecute(() -> {
                 double xInput = x.getAsDouble();
@@ -326,22 +350,32 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
                 reefAssist.error = robotAngle.minus(reefReference.getRotation()).getRadians();
                 reefAssist.output = reefAssist.running ? reefAssist.error * norm * norm * kReefAssistKp.value() : 0.0;
 
+                double ddd = angularPID.calculate(
+                    state.rotation.getRadians(),
+                    reefReference.getRotation().getRadians());
+
+               if(reefAssist.targetPipe.getTranslation().getDistance(state.translation) < kAutoDriveTolerance.value()) {
+                var assist = new ChassisSpeeds(
+                     reefPIDx.calculate(state.pose.getX(), reefAssist.targetPipe.getX()),
+                    reefPIDy.calculate(state.pose.getY(), reefAssist.targetPipe.getY()),
+                        ddd
+                    );
+
+                api.applyAssistedDriverInput(0.0, 0.0, 0.0, assist, Perspective.kOperator, true, true);
+               } else {
                 var assist = Perspective.kOperator.toPerspectiveSpeeds(
                     new ChassisSpeeds(
                         0.0,
                         reefAssist.output,
-                        !exitLock.value
-                            ? angularPID.calculate(
-                                state.rotation.getRadians(),
-                                reefReference.getRotation().getRadians()
-                            )
-                            : 0.0
+                        ddd
                     ),
                     reefReference.getRotation()
                 );
 
-                if (!Math2.epsilonEquals(angularInput, 0.0)) exitLock.value = true;
                 api.applyAssistedDriverInput(xInput, yInput, angularInput, assist, Perspective.kOperator, true, true);
+               }
+
+                
             })
             .onEnd(() -> reefAssist.running = false);
     }
@@ -361,8 +395,6 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
      */
     public Command resetAutoPID() {
         return Commands.runOnce(() -> {
-            autoLast = null;
-            autoNext = autoLast;
             autoPIDx.reset();
             autoPIDy.reset();
             autoPIDangular.reset();

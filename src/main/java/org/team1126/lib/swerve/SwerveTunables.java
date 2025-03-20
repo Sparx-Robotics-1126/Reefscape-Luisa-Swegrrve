@@ -85,6 +85,8 @@ final class SwerveTunables {
         Tunable.doubleValue(name + "/driverProfile/angularVelDeadband", config.driverAngularVelDeadband, v ->
             config.driverAngularVelDeadband = v
         );
+
+        Tunable.doubleValue("/wheelDiameter", config.wheelDiameter, v -> config.wheelDiameter = v);
     }
 
     /**
