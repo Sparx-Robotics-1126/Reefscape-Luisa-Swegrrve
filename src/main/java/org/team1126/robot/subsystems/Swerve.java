@@ -83,12 +83,14 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         
                     // Odometry: how fast the odometry updates, lower if we need lower CAN utilization. 
                     // Discretization: Should not be changed.
-        
-        .setMovePID(0.08, 0.0, 0.0)  //PID tuning!!!
-        .setMoveFF(0.05, 0.128)         //      |
-        .setTurnPID(0.05, 0.0, 0.2)  //      V
+                    .setMovePID(0.01, 0.0, 0.0)
+                    .setMoveFF(0.05, 0.127)
+                    .setTurnPID(.05, 0.0, 0.2)
+        // .setMovePID(0.08, 0.0, 0.0)  //PID tuning!!!
+        // .setMoveFF(0.05, 0.128)         //      |
+        // .setTurnPID(0.05, 0.0, 0.2)  //      V
         .setBrakeMode(false, true)  // Think about turning move to false for testing?
-        .setLimits(4.5, 0.05, 17.5, 14.0, 30.0) 
+        .setLimits(4.0, 0.05, 15.5, 10.0, 30.0) 
 
                     // Velocity: the max speed the MOTORS are able to go. please don't change this.
                     // VelDeadband: how much deadband is needed on the controller to start moving. 
@@ -103,7 +105,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
                     // angularVel: limits the angular velocity so that we dont overuse motors
                     // angularVelDeadband: also self-explanatory
 
-        .setPowerProperties(Constants.kVoltage, 60.0, 60.0, 60.0, 60.0)
+        .setPowerProperties(Constants.kVoltage, 60.0, 60.0, 40.0, 40.0)
         .setMechanicalProperties(6.12, 21.4285714286, 0.0, Units.inchesToMeters(3.74))
         .setOdometryStd(0.1, 0.1, 0.1)
         .setIMU(SwerveIMUs.pigeon2(RobotMap.kCanandgyro))

@@ -10,10 +10,10 @@ import org.team1126.robot.subsystems.ArmSubsystem;
 public class ControllerMoveArm extends Command {
     
     private final DoubleSupplier m_power;
-    private final ArmSubsystem m_arm;
+    private  ArmSubsystem m_arm;
 
     public ControllerMoveArm(DoubleSupplier power, ArmSubsystem arm) {
-        // addRequirements(RobotContainer.m_arm);
+        // addRequirements(m_arm);
         m_power = power;
         m_arm = arm;
     }

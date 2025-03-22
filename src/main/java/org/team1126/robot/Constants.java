@@ -35,7 +35,7 @@ public final class Constants {
         public static final Translation2d kReefCenterRed = ChoreoAllianceFlipUtil.flip(kReefCenterBlue);
 
         public static final double kPipeOffsetX = -1.42;
-        public static final double kPipeOffsetY = -0.164;
+        public static final double kPipeOffsetY = -0.364;
 
         public static final double kReefCenterToWallDistance = 0.781;
     }
@@ -47,16 +47,16 @@ public final class Constants {
         //     new Rotation3d(0.0, Math.toRadians(-5.0), Math.toRadians(0.0))
         // );
         public static final Transform3d kLeft = new Transform3d(
-          new Translation3d(Units.inchesToMeters(10.5),
-          Units.inchesToMeters(11.25),
+          new Translation3d(Units.inchesToMeters(10.75),
+          Units.inchesToMeters(12),
           Units.inchesToMeters(8.25)),
-            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(-31))
+            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(-35.2))
         );
         public static final Transform3d kRight = new Transform3d(
-          new Translation3d(Units.inchesToMeters(10.5),
-          Units.inchesToMeters(-11.25),
+          new Translation3d(Units.inchesToMeters(10.75),
+          Units.inchesToMeters(-12),
           Units.inchesToMeters(8.25)),
-            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(31))
+            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(35.2))
         );
     }
 

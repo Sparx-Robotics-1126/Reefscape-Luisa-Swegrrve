@@ -14,6 +14,7 @@ public class PositionCoral extends Command {
 
     @Override
     public void execute() {
+        System.out.println("Positioning Coral");
             placer.movePlacer(-.1);
 
      }

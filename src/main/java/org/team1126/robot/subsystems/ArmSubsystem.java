@@ -182,6 +182,8 @@ public class ArmSubsystem extends SubsystemBase {
         return run(() -> turnReachGoal(degree));
     }
 
+    
+
     /**
      * Sets arm speed to 0
      */
