@@ -39,7 +39,7 @@ public final class Constants {
 
         public static final TunableDouble kPipeOffsetX = Tunable.doubleValue("swerve/pipeOffsetX", -1.38);
         public static final TunableDouble kPipeOffsetYLeft = Tunable.doubleValue("swerve/pipeOffsetYLeft",-0.21);
-        public static final TunableDouble kPipeOffsetYRight = Tunable.doubleValue("swerve/pipeOffsetYRight",-0.07);
+        public static final TunableDouble kPipeOffsetYRight = Tunable.doubleValue("swerve/pipeOffsetYRight",-0.03);
 
         public static final double kReefCenterToWallDistance = 0.781;
     }
@@ -68,7 +68,7 @@ public final class Constants {
     public static final int ARM_SENSOR_ID = 1; //need to be changed
     public static final int EXTENSION_SENSOR_ID = 2; //also needs changing!!
     public static final double L1_ARM_POS = 11.76196;
-    public static final double L2_ARM_POS = 22.238;
+    public static final double L2_ARM_POS = 21.238;
     public static final double L3_ARM_POS = 26.5;
     public static final double L4_ARM_POS = 33.5;
 }

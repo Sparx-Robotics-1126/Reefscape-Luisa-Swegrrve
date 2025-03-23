@@ -111,10 +111,6 @@ public final class Robot extends TimedRobot {
         driver.leftBumper().onTrue(selection.setLeft()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
         driver.rightBumper().onTrue(selection.setRight()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
         driver.leftTrigger().onTrue(swerve.tareRotation());
-        // driver.leftBumper().whileTrue(new DriveToClosestLeftBranchPoseCommand(swerve));  
-        // driver.leftBumper().whileTrue(swerve.driveToPose(swerve.getClosestLeftBranchPose()));
-        // driver.leftBumper().whileTrue(swerve.driveToPose(AprilTagPositions.APRILTAGS_BLU[0]));
-        // driver.rightBumper().whileTrue(swerve.driveToPose(swerve.getClosestRightBranchPose()));
 
         // Operator bindings
         operator.povDown().whileTrue(new MoveArmToAngle(arm, 0).alongWith(new MoveExtensionToPos(extension, arm, 0.01))); //arm home
@@ -122,8 +118,8 @@ public final class Robot extends TimedRobot {
                   .alongWith(new IngestCoral(placer, -.5).andThen(new PositionCoral(placer))));                                                    //arm to coral station
 
         operator.a().whileTrue(new MoveArmToAngle(arm, ArmConstants.L1_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, 0.013659)).alongWith(new ReefLights(leds, true, 1))); //arm l1
-        operator.x().whileTrue(new MoveArmToAngle(arm, ArmConstants.L2_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm,-0.0831989)).alongWith(new ReefLights(leds, true, 2))); //arm l2
-        operator.b().whileTrue(new MoveArmToAngle(arm,  ArmConstants.L3_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, -0.25)).alongWith(new ReefLights(leds, true, 3))); //arm l3
+        operator.x().whileTrue(new MoveArmToAngle(arm, ArmConstants.L2_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm,-0.1431989)).alongWith(new ReefLights(leds, true, 2))); //arm l2
+        operator.b().whileTrue(new MoveArmToAngle(arm,  ArmConstants.L3_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, -0.2)).alongWith(new ReefLights(leds, true, 3))); //arm l3
         operator.y().whileTrue(new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, -0.55)).alongWith(new ReefLights(leds, true, 4))); //arm l4
 
         operator.rightTrigger(0.1).whileTrue(new AnalogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value), placer,false));

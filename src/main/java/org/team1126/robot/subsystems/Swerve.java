@@ -156,8 +156,8 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         vision = VisionManager.getInstance();
 
 
-        reefPIDx = new PIDController(7.0, 0.0, 0.0);
-        reefPIDy = new PIDController(7.0, 0.0, 0.0);
+        reefPIDx = new PIDController(6.0, 0.0, 0.40);
+        reefPIDy = new PIDController(6.0, 0.0, 0.40);
 
         autoPIDx = new PIDController(15.0, 0.0, 0.0);
         autoPIDy = new PIDController(15.0, 0.0, 0.0);

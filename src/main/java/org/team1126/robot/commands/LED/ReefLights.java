@@ -38,17 +38,17 @@ public class ReefLights extends Command {
                 System.out.println("@ l4");
             } 
         } 
-        else {
-            if(color == 1){
-                ledSubsystem.setPulse(new Color8Bit(255, 141, 0), 1, 94, ledSubsystem.getLedBuffer().getLength());
-            } else if(color == 2){
-                ledSubsystem.setPulse(new Color8Bit(186, 255, 0), 1, 94,  ledSubsystem.getLedBuffer().getLength());
-            } else if (color == 3){
-                ledSubsystem.setPulse(new Color8Bit(0, 255, 240), 1, 94,  ledSubsystem.getLedBuffer().getLength());
-            } else {
-                ledSubsystem.setPulse(new Color8Bit(148, 0, 255), 1, 94,  ledSubsystem.getLedBuffer().getLength());
-            }
-        }
+        // else {
+        //     if(color == 1){
+        //         ledSubsystem.setPulse(new Color8Bit(255, 141, 0), 1, 94, ledSubsystem.getLedBuffer().getLength());
+        //     } else if(color == 2){
+        //         ledSubsystem.setPulse(new Color8Bit(186, 255, 0), 1, 94,  ledSubsystem.getLedBuffer().getLength());
+        //     } else if (color == 3){
+        //         ledSubsystem.setPulse(new Color8Bit(0, 255, 240), 1, 94,  ledSubsystem.getLedBuffer().getLength());
+        //     } else {
+        //         ledSubsystem.setPulse(new Color8Bit(148, 0, 255), 1, 94,  ledSubsystem.getLedBuffer().getLength());
+        //     }
+        // }
         ledSubsystem.update();
 
     }
