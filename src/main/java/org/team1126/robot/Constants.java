@@ -1,5 +1,8 @@
 package org.team1126.robot;
 
+import org.team1126.lib.util.Tunable;
+import org.team1126.lib.util.Tunable.TunableDouble;
+
 import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -34,29 +37,25 @@ public final class Constants {
         public static final Translation2d kReefCenterBlue = new Translation2d(4.489, kWidth / 2.0);
         public static final Translation2d kReefCenterRed = ChoreoAllianceFlipUtil.flip(kReefCenterBlue);
 
-        public static final double kPipeOffsetX = -1.42;
-        public static final double kPipeOffsetY = -0.364;
+        public static final TunableDouble kPipeOffsetX = Tunable.doubleValue("swerve/pipeOffsetX", -1.36);
+        public static final TunableDouble kPipeOffsetY = Tunable.doubleValue("swerve/pipeOffsetY",-0.15);
 
         public static final double kReefCenterToWallDistance = 0.781;
     }
 
     public final class Cameras {
-
-        // public static final Transform3d kMiddle = new Transform3d(
-        //     new Translation3d(0.354, 0.0, 0.215),
-        //     new Rotation3d(0.0, Math.toRadians(-5.0), Math.toRadians(0.0))
-        // );
+        
         public static final Transform3d kLeft = new Transform3d(
           new Translation3d(Units.inchesToMeters(10.75),
-          Units.inchesToMeters(12),
+          Units.inchesToMeters(7),
           Units.inchesToMeters(8.25)),
-            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(-35.2))
+            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(-18.4))
         );
         public static final Transform3d kRight = new Transform3d(
           new Translation3d(Units.inchesToMeters(10.75),
           Units.inchesToMeters(-12),
           Units.inchesToMeters(8.25)),
-            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(35.2))
+            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(18.4))
         );
     }
 
@@ -71,6 +70,13 @@ public final class Constants {
     public static final double L2_ARM_POS = 22.238;
     public static final double L3_ARM_POS = 26.5;
     public static final double L4_ARM_POS = 33.5;
+}
+
+public static final class ExtensionConstants {
+  public static final double L1_EXT_POS = 0.013659;
+  public static final double L2_EXT_POS =-0.0831989;
+  public static final double L3_EXT_POS = -0.25;
+  public static final double L4_EXT_POS = -0.55;
 }
 
 public static final class PlacerConstants {

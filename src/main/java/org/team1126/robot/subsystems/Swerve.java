@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -38,6 +39,7 @@ import org.team1126.lib.util.command.GRRSubsystem;
 import org.team1126.robot.Constants;
 import org.team1126.robot.Constants.FieldConstants;
 import org.team1126.robot.Constants.RobotMap;
+import org.team1126.robot.Robot;
 import org.team1126.robot.util.VisionManager;
 
 /**
@@ -89,7 +91,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         // .setMovePID(0.08, 0.0, 0.0)  //PID tuning!!!
         // .setMoveFF(0.05, 0.128)         //      |
         // .setTurnPID(0.05, 0.0, 0.2)  //      V
-        .setBrakeMode(false, true)  // Think about turning move to false for testing?
+        .setBrakeMode(true, true)  // Think about turning move to false for testing?
         .setLimits(4.0, 0.05, 15.5, 10.0, 30.0) 
 
                     // Velocity: the max speed the MOTORS are able to go. please don't change this.
@@ -124,9 +126,11 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
     private static final TunableDouble kReefDangerDistance = Tunable.doubleValue("swerve/kReefDangerDistance", 0.6);
     private static final TunableDouble kReefHappyDistance = Tunable.doubleValue("swerve/kReefHappyDistance", 3.0);
 
+
     private final SwerveAPI api;
     private final SwerveState state;
     private final VisionManager vision;
+
 
     private final PIDController autoPIDx;
     private final PIDController autoPIDy;
@@ -150,6 +154,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         api = new SwerveAPI(kConfig);
         state = api.state;
         vision = VisionManager.getInstance();
+
 
         reefPIDx = new PIDController(7.0, 0.0, 0.0);
         reefPIDy = new PIDController(7.0, 0.0, 0.0);
@@ -267,7 +272,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
             var antiBeach = Perspective.kOperator.toPerspectiveSpeeds(
                 new ChassisSpeeds(
                     Math.abs(pitch) > kBeachTolerance.value() ? Math.copySign(kBeachSpeed.value(), pitch) : 0.0,
-                    Math.abs(roll) > kBeachTolerance.value() ? Math.copySign(kBeachSpeed.value(), -roll) : 0.0,
+                    Math.abs(roll) > kBeachTolerance.value()  ? Math.copySign(kBeachSpeed.value(), -roll) : 0.0,
                     0.0
                 ),
                 state.rotation
@@ -327,8 +332,8 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
                         .getTranslation()
                         .plus(
                             new Translation2d(
-                                FieldConstants.kPipeOffsetX,
-                                FieldConstants.kPipeOffsetY * (left.getAsBoolean() ? -1.0 : 1.0)
+                                FieldConstants.kPipeOffsetX.value(),
+                                FieldConstants.kPipeOffsetY.value() * (left.getAsBoolean() ? -1.0 : 1.0)
                             ).rotateBy(reefReference.getRotation())
                         ),
                     reefReference.getRotation()

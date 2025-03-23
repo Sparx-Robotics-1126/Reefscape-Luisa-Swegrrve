@@ -25,6 +25,8 @@ public class ClimbSubsystem extends SubsystemBase {
 
     private SparkClosedLoopController pidController;
 
+    private boolean beach;
+
     protected ShuffleboardTab climbTab;
 
     public ClimbSubsystem() {
@@ -103,5 +105,13 @@ public class ClimbSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Climb position", getAngle());
+    }
+
+    public void setBeachMode(boolean set) {
+        beach = set;
+    }
+
+    public boolean getBeachMode(){
+        return beach;
     }
 }

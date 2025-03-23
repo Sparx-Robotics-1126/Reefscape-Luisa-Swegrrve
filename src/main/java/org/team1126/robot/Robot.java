@@ -25,6 +25,7 @@ import org.team1126.lib.util.Tunable;
 import org.team1126.robot.Constants.AprilTagPositions;
 import org.team1126.robot.Constants.ArmConstants;
 import org.team1126.robot.commands.Autos;
+import org.team1126.robot.commands.Routines;
 import org.team1126.robot.commands.LED.RainbowCommand;
 import org.team1126.robot.commands.LED.ReefLights;
 import org.team1126.robot.commands.LED.TeamLights;
@@ -58,6 +59,7 @@ public final class Robot extends TimedRobot {
     public final Autos autos;
     public final LEDs leds;
     public final ReefSelection selection;
+    public final Routines routines;
 
 
     private final CommandXboxController driver;
@@ -92,9 +94,11 @@ public final class Robot extends TimedRobot {
         swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));
         leds.setDefaultCommand(new TeamLights(leds));
         // arm.setDefaultCommand(new ControllerMoveArm(()-> operator.getRawAxis(XboxController.Axis.kLeftY.value), arm));
-       extension.setDefaultCommand(extension.setExtGoal( .05));
+       extension.setDefaultCommand(extension.setExtGoal( .03));
 
+       routines = new Routines(this);
         autos = new Autos(this);
+        
 
         //driver.leftTrigger().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
         //driver.a().onTrue(new InstantCommand(() -> swerve.resetPose(null)));
@@ -115,7 +119,7 @@ public final class Robot extends TimedRobot {
         // Operator bindings
         operator.povDown().whileTrue(new MoveArmToAngle(arm, 0).alongWith(new MoveExtensionToPos(extension, arm, 0.01))); //arm home
         operator.povUp().whileTrue(new MoveArmToAngle(arm, 18.442849922180176).alongWith(new MoveExtensionToPos(extension, arm, .01))
-                  .alongWith(new IngestCoral(placer, -.5)).andThen(new PositionCoral(placer)));                                                    //arm to coral station
+                  .alongWith(new IngestCoral(placer, -.5).andThen(new PositionCoral(placer))));                                                    //arm to coral station
 
         operator.a().whileTrue(new MoveArmToAngle(arm, ArmConstants.L1_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, 0.013659)).alongWith(new ReefLights(leds, true, 1))); //arm l1
         operator.x().whileTrue(new MoveArmToAngle(arm, ArmConstants.L2_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm,-0.0831989)).alongWith(new ReefLights(leds, true, 2))); //arm l2
@@ -129,6 +133,7 @@ public final class Robot extends TimedRobot {
         RobotModeTriggers.autonomous().whileTrue(autos.runSelectedAuto());
         RobotModeTriggers.autonomous().whileTrue(new RainbowCommand(leds));
 
+        
         // driver.x().onTrue(none()); // Reserved (No goosing around)
         // driver.y().onTrue(none()); // Reserved (Force goose spit)
 
@@ -176,7 +181,10 @@ public final class Robot extends TimedRobot {
     public void simulationPeriodic() {}
 
     @Override
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+        var lights = new TeamLights(leds);
+        lights.initialize();
+    }
 
     @Override
     public void autonomousPeriodic() {}
@@ -186,4 +194,6 @@ public final class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {}
+
+
 }

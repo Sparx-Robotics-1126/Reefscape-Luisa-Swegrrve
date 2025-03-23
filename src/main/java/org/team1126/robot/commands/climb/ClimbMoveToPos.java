@@ -17,18 +17,15 @@ public class ClimbMoveToPos extends Command {
 
     @Override
     public void execute() {
-        // if(climb.getAngle() > targetAngle) {
+
             climb.climbReachGoal(targetAngle);
-        // } else if(climb.getAngle() < targetAngle) {
-        //     climb.moveClimbToPos(targetAngle);
-        // }
+            climb.setBeachMode(false);
+
     }
 
     @Override
     public boolean isFinished() {
-        // if(climb.getAngle() < -160 || climb.getAngle() > 90) {
-        //     return true;
-        // }
+        climb.setBeachMode(true);
         return false;
     }
     @Override

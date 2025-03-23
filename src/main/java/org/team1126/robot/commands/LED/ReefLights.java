@@ -22,33 +22,33 @@ public class ReefLights extends Command {
     // halfway is 94
 
     @Override
-    public void execute() {
+    public void initialize() {
         if(isRight){
             if(color == 1){
-                ledSubsystem.setPulse(new Color8Bit(255, 141, 0), 1, 0, ledSubsystem.getLedBuffer().getLength());
+                ledSubsystem.setPulse(new Color8Bit(255, 141, 0), 2, 0, ledSubsystem.getLedBuffer().getLength() / 2);
                 System.out.println("@ l1");
             } else if(color == 2){
-                ledSubsystem.setPulse(new Color8Bit(186, 255, 0), 1, 0, ledSubsystem.getLedBuffer().getLength());
+                ledSubsystem.setPulse(new Color8Bit(186, 255, 0), 1, 0, ledSubsystem.getLedBuffer().getLength() / 2);
                 System.out.println("@ l2");
             } else if (color == 3){
-                ledSubsystem.setPulse(new Color8Bit(0, 255, 240), 1, 0, ledSubsystem.getLedBuffer().getLength());
+                ledSubsystem.setPulse(new Color8Bit(0, 255, 240), 1, 0, ledSubsystem.getLedBuffer().getLength() / 2);
                 System.out.println("@ l3");
             } else if (color == 4){
-                ledSubsystem.setPulse(new Color8Bit(148, 0, 255), 1, 0, ledSubsystem.getLedBuffer().getLength());
+                ledSubsystem.setPulse(new Color8Bit(148, 0, 255), 1, 0, ledSubsystem.getLedBuffer().getLength() / 2);
                 System.out.println("@ l4");
             } 
         } 
-        // else {
-        //     if(color == 1){
-        //         ledSubsystem.setPulse(new Color8Bit(255, 141, 0), 1, 94, ledSubsystem.getLedBuffer().getLength());
-        //     } else if(color == 2){
-        //         ledSubsystem.setPulse(new Color8Bit(186, 255, 0), 1, 94,  ledSubsystem.getLedBuffer().getLength());
-        //     } else if (color == 3){
-        //         ledSubsystem.setPulse(new Color8Bit(0, 255, 240), 1, 94,  ledSubsystem.getLedBuffer().getLength());
-        //     } else {
-        //         ledSubsystem.setPulse(new Color8Bit(143, 0, 255), 1, 94,  ledSubsystem.getLedBuffer().getLength());
-        //     }
-        // }
+        else {
+            if(color == 1){
+                ledSubsystem.setPulse(new Color8Bit(255, 141, 0), 1, 94, ledSubsystem.getLedBuffer().getLength());
+            } else if(color == 2){
+                ledSubsystem.setPulse(new Color8Bit(186, 255, 0), 1, 94,  ledSubsystem.getLedBuffer().getLength());
+            } else if (color == 3){
+                ledSubsystem.setPulse(new Color8Bit(0, 255, 240), 1, 94,  ledSubsystem.getLedBuffer().getLength());
+            } else {
+                ledSubsystem.setPulse(new Color8Bit(148, 0, 255), 1, 94,  ledSubsystem.getLedBuffer().getLength());
+            }
+        }
         ledSubsystem.update();
 
     }
@@ -60,7 +60,7 @@ public class ReefLights extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        lights.initialize();
+       
     }
 
 
