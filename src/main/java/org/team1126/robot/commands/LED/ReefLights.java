@@ -22,7 +22,7 @@ public class ReefLights extends Command {
     // halfway is 94
 
     @Override
-    public void initialize() {
+    public void execute() {
         if(isRight){
             if(color == 1){
                 ledSubsystem.setPulse(new Color8Bit(255, 141, 0), 2, 0, ledSubsystem.getLedBuffer().getLength() / 2);

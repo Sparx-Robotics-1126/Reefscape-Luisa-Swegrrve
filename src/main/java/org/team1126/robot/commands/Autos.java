@@ -99,9 +99,12 @@ private AutoRoutine moveTestAutoRoutine(boolean mirror){
 
     );
     
-    part1.active().onTrue(routines.toL4(arm, extension));
+    // part1.active().onTrue(routines.toL4(arm, extension));
+    part1.active().onTrue(print("toL4"));
     
-    part1.atTime(.75).onTrue(routines.placeL4(arm, extension, placer));
+    // part1.atTime(.75).onTrue(routines.placeL4(arm, extension, placer));
+    part1.atTime(.75).onTrue(print("placing coral"));
+
     part1.chain(part2);
     part2.atTime(.75).onTrue(routines.toCoral(arm, extension).withTimeout(3));
 

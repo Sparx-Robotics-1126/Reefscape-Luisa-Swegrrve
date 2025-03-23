@@ -333,12 +333,12 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
                         .plus(
                             new Translation2d(
                                 FieldConstants.kPipeOffsetX.value(),
-                                FieldConstants.kPipeOffsetY.value() * (left.getAsBoolean() ? -1.0 : 1.0)
+                                (left.getAsBoolean() ? FieldConstants.kPipeOffsetYLeft.value() : FieldConstants.kPipeOffsetYRight.value()) * (left.getAsBoolean() ? -1.0 : 1.0)
                             ).rotateBy(reefReference.getRotation())
                         ),
                     reefReference.getRotation()
+                   
                 );
-
                 Rotation2d robotAngle = reefAssist.targetPipe.getTranslation().minus(state.translation).getAngle();
                 Rotation2d xyAngle = !inDeadband
                     ? new Rotation2d(-yInput, -xInput).rotateBy(Alliance.isBlue() ? Rotation2d.kZero : Rotation2d.kPi)
@@ -362,11 +362,13 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
                     reefReference.getRotation().getRadians());
 
                if(reefAssist.targetPipe.getTranslation().getDistance(state.translation) < kAutoDriveTolerance.value()) {
-                var assist = new ChassisSpeeds(
-                     reefPIDx.calculate(state.pose.getX(), reefAssist.targetPipe.getX()),
-                    reefPIDy.calculate(state.pose.getY(), reefAssist.targetPipe.getY()),
+                var assist =
+                        new ChassisSpeeds(
+                            (Alliance.isRed() ? -1 : 1) * reefPIDx.calculate(state.pose.getX(), reefAssist.targetPipe.getX()),
+                            (Alliance.isRed() ? -1 : 1) * reefPIDy.calculate(state.pose.getY(), reefAssist.targetPipe.getY()),
                         ddd
-                    );
+                        )
+                ;
 
                 api.applyAssistedDriverInput(0.0, 0.0, 0.0, assist, Perspective.kOperator, true, true);
                } else {
@@ -378,6 +380,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
                     ),
                     reefReference.getRotation()
                 );
+
 
                 api.applyAssistedDriverInput(xInput, yInput, angularInput, assist, Perspective.kOperator, true, true);
                }
