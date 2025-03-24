@@ -69,13 +69,16 @@ public final class Routines {
 
     public Command placeL4(ArmSubsystem arm, ExtensionSubsystem extension, PlacerSubsystem placer) {
 
-        return sequence(waitUntil(placer::bottomHasCoral))
-
-        return parallel(
-            new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS),
-            new MoveExtensionToPos(extension, arm, ExtensionConstants.L4_EXT_POS),
-            new PlaceCoral(placer, .3)
-        );
+        return 
+            parallel(
+                new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS),
+                new MoveExtensionToPos(extension, arm, ExtensionConstants.L4_EXT_POS),
+                sequence (
+                    waitUntil(swerve::inRange),
+                    new PlaceCoral(placer, .3) 
+                )
+                
+            );
     }
 
     public Command moveHome(ArmSubsystem arm, ExtensionSubsystem extension){

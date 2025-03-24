@@ -101,16 +101,10 @@ private AutoRoutine moveTestAutoRoutine(boolean mirror){
 
     routine.observe(placer::bottomHasCoral).onTrue(routines.placeL4(arm, extension, placer));
     
-    // part1.active().onTrue(routines.toL4(arm, extension));
-    part1.active().onTrue(print("toL4"));
-    
-    // part1.atTime(.75).onTrue(routines.placeL4(arm, extension, placer));
-    part1.atTime(.75).onTrue(print("placing coral"));
+    part1.atTime(1).onTrue(routines.driveToCoral(mirror));
 
-    part1.atTime(2).onTrue(routines.driveToCoral(mirror));
-
-    part1.chain(part2);
-    part2.atTime(.75).onTrue(routines.toCoral(arm, extension).withTimeout(3));
+    // part1.chain(part2);
+    // part2.atTime(1).onTrue(routines.toCoral(arm, extension).withTimeout(3));
 
 
 

@@ -81,6 +81,10 @@ public class PlacerSubsystem extends SubsystemBase {
         return placer.get();
     }
 
+    public boolean coralClear() {
+        return !bottomSensor.getIsDetected().getValue();
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run

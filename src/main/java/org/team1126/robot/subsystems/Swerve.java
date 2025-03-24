@@ -228,10 +228,10 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
     }
 
     /**
-     * Returns true if the goose is happy!!
+     * Returns true if the goose is happy!! 
      * (Robot is facing the reef and within the happy distance).
      */
-    public boolean happyGoose() {
+    public boolean inRange() {
         return facingReef && wallDistance < kReefHappyDistance.value();
     }
 
