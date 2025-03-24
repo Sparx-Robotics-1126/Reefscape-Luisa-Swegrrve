@@ -117,10 +117,10 @@ public final class Robot extends TimedRobot {
         operator.povUp().whileTrue(new MoveArmToAngle(arm, 18.442849922180176).alongWith(new MoveExtensionToPos(extension, arm, .01))
                   .alongWith(new IngestCoral(placer, -.5).andThen(new PositionCoral(placer))));                                                    //arm to coral station
 
-        operator.a().whileTrue(new MoveArmToAngle(arm, ArmConstants.L1_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, 0.013659)).alongWith(new ReefLights(leds, operator.rightBumper().getAsBoolean(), 1))); //arm l1
-        operator.x().whileTrue(new MoveArmToAngle(arm, ArmConstants.L2_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm,-0.1431989)).alongWith(new ReefLights(leds, operator.rightBumper().getAsBoolean(), 2))); //arm l2
-        operator.b().whileTrue(new MoveArmToAngle(arm,  ArmConstants.L3_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, -0.2)).alongWith(new ReefLights(leds, operator.rightBumper().getAsBoolean(), 3))); //arm l3
-        operator.y().whileTrue(new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, -0.55)).alongWith(new ReefLights(leds, operator.rightBumper().getAsBoolean(), 4))); //arm l4
+        operator.a().whileTrue(new MoveArmToAngle(arm, ArmConstants.L1_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, 0.013659)).alongWith(new ReefLights(leds, driver.rightBumper().getAsBoolean(), 1))); //arm l1
+        operator.x().whileTrue(new MoveArmToAngle(arm, ArmConstants.L2_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm,-0.1431989)).alongWith(new ReefLights(leds, driver.rightBumper().getAsBoolean(), 2))); //arm l2
+        operator.b().whileTrue(new MoveArmToAngle(arm,  ArmConstants.L3_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, -0.2)).alongWith(new ReefLights(leds, driver.rightBumper().getAsBoolean(), 3))); //arm l3
+        operator.y().whileTrue(new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, -0.55)).alongWith(new ReefLights(leds, driver.rightBumper().getAsBoolean(), 4))); //arm l4
 
         operator.rightTrigger(0.1).whileTrue(new AnalogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value), placer,false));
         operator.leftTrigger(0.1).whileTrue(new AnalogPlacer(() -> operator.getRawAxis(XboxController.Axis.kLeftTrigger.value), placer,true));

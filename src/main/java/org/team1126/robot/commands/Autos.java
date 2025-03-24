@@ -98,12 +98,16 @@ private AutoRoutine moveTestAutoRoutine(boolean mirror){
         )
 
     );
+
+    routine.observe(placer::bottomHasCoral).onTrue(routines.placeL4(arm, extension, placer));
     
     // part1.active().onTrue(routines.toL4(arm, extension));
     part1.active().onTrue(print("toL4"));
     
     // part1.atTime(.75).onTrue(routines.placeL4(arm, extension, placer));
     part1.atTime(.75).onTrue(print("placing coral"));
+
+    part1.atTime(2).onTrue(routines.driveToCoral(mirror));
 
     part1.chain(part2);
     part2.atTime(.75).onTrue(routines.toCoral(arm, extension).withTimeout(3));
@@ -126,10 +130,12 @@ private AutoRoutine l4Straight(boolean mirror) {
                 swerve.resetAutoPID()
             ),
             straightPath.spawnCmd()
+
         )
     );
     
     routines.toL4(arm, extension).withTimeout(1);
+    straightPath.atTime(1).whileTrue(routines.driveToCoral(mirror));
     straightPath.active().onTrue(routines.toL4(arm, extension).withTimeout(3).andThen(routines.placeL4(arm, extension, placer).withTimeout(1)));
 
 
