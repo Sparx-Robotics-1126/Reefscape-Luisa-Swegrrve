@@ -2,8 +2,6 @@ package org.team1126.robot.subsystems;
 
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
-import com.ctre.phoenix6.CANBus;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -16,7 +14,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -39,7 +36,6 @@ import org.team1126.lib.util.command.GRRSubsystem;
 import org.team1126.robot.Constants;
 import org.team1126.robot.Constants.FieldConstants;
 import org.team1126.robot.Constants.RobotMap;
-import org.team1126.robot.Robot;
 import org.team1126.robot.util.VisionManager;
 
 /**
@@ -183,7 +179,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         api.refresh();
 
         // Apply vision estimates to the pose estimator.
-        api.addVisionMeasurements(vision.getUnreadResults(state.imu.yawMeasurements));
+        api.addVisionMeasurements(vision.getUnreadResults(state.poseHistory));
 
         // Calculate helpers
         Translation2d reefCenter = Alliance.isBlue() ? FieldConstants.kReefCenterBlue : FieldConstants.kReefCenterRed;
@@ -266,8 +262,9 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
      */
     public Command drive(DoubleSupplier x, DoubleSupplier y, DoubleSupplier angular) {
         return commandBuilder("Swerve.drive()").onExecute(() -> {
-            double pitch = state.imu.pitch.getRadians();
-            double roll = state.imu.roll.getRadians();
+            double pitch = state.pitch.getRadians();
+            double roll = state.roll.getRadians();
+
 
             var antiBeach = Perspective.kOperator.toPerspectiveSpeeds(
                 new ChassisSpeeds(

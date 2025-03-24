@@ -6,6 +6,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.BooleanSupplier;
@@ -49,6 +50,13 @@ public final class Routines {
         selection = robot.selection;
         arm = robot.arm;
         extension = robot.extension;
+    }
+
+    public Command driveToCoral(boolean isRight) {
+
+        return parallel(
+            swerve.driveReef(robot::driverX, robot::driverY, robot::driverAngular, selection::isLeft)
+        );
     }
 
     public Command toL4(ArmSubsystem arm, ExtensionSubsystem extension) {

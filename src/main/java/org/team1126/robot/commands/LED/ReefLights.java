@@ -23,21 +23,47 @@ public class ReefLights extends Command {
 
     @Override
     public void execute() {
+
+        int start = 0;
+        int mid = ledSubsystem.getLedBuffer().getLength() / 2;
+        int end = ledSubsystem.getLedBuffer().getLength();
         if(isRight){
             if(color == 1){
-                ledSubsystem.setPulse(new Color8Bit(255, 141, 0), 2, 0, ledSubsystem.getLedBuffer().getLength() / 2);
-                System.out.println("@ l1");
+                for (int i = start; i < mid; i++) {
+                    ledSubsystem.setColor(i,255, 141, 0);
+                }
             } else if(color == 2){
-                ledSubsystem.setPulse(new Color8Bit(186, 255, 0), 1, 0, ledSubsystem.getLedBuffer().getLength() / 2);
-                System.out.println("@ l2");
+                for (int i = start; i < mid; i++) {
+                    ledSubsystem.setColor(i,186, 255, 0);
+                }
             } else if (color == 3){
-                ledSubsystem.setPulse(new Color8Bit(0, 255, 240), 1, 0, ledSubsystem.getLedBuffer().getLength() / 2);
-                System.out.println("@ l3");
+                for (int i = start; i < mid; i++) {
+                    ledSubsystem.setColor(i, 0, 255, 240);
+                }
             } else if (color == 4){
-                ledSubsystem.setPulse(new Color8Bit(148, 0, 255), 1, 0, ledSubsystem.getLedBuffer().getLength() / 2);
-                System.out.println("@ l4");
+                for (int i = start; i < mid; i++) {
+                    ledSubsystem.setColor(i, 148, 0, 255);
+                }
             } 
-        } 
+        }  else {
+            if(color == 1){
+                for (int i = mid; i < end; i++) {
+                    ledSubsystem.setColor(i,255, 141, 0);
+                }
+            } else if(color == 2){
+                for (int i = mid; i < end; i++) {
+                    ledSubsystem.setColor(i,186, 255, 0);
+                }
+            } else if (color == 3){
+                for (int i = mid; i < end; i++) {
+                    ledSubsystem.setColor(i, 0, 255, 240);
+                }
+            } else if (color == 4){
+                for (int i = mid; i < end; i++) {
+                    ledSubsystem.setColor(i, 148, 0, 255);
+                }
+            } 
+        }
         // else {
         //     if(color == 1){
         //         ledSubsystem.setPulse(new Color8Bit(255, 141, 0), 1, 94, ledSubsystem.getLedBuffer().getLength());

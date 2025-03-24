@@ -31,9 +31,6 @@ import org.team1126.lib.util.Math2;
 import org.team1126.lib.util.Sleep;
 import org.team1126.robot.Robot;
 
-/**
- * An implementation of a swerve drivetrain, with support for various hardware.
- */
 public class SwerveAPI implements AutoCloseable {
 
     public final SwerveState state;
@@ -120,13 +117,9 @@ public class SwerveAPI implements AutoCloseable {
 
             state.pose = poseEstimator.getEstimatedPosition();
 
-            state.imu.yawMeasurements.clear();
-            state.imu.yawMeasurements.addAll(odometryThread.yawMeasurements);
-            odometryThread.yawMeasurements.clear();
-
-            if (!state.imu.yawMeasurements.isEmpty()) {
-                state.imu.yaw = state.imu.yawMeasurements.get(state.imu.yawMeasurements.size() - 1).yaw();
-            }
+            state.poseHistory.clear();
+            state.poseHistory.addAll(odometryThread.poseHistory);
+            odometryThread.poseHistory.clear();
         } finally {
             odometryMutex.unlock();
         }
@@ -136,8 +129,8 @@ public class SwerveAPI implements AutoCloseable {
         state.translation = state.pose.getTranslation();
         state.rotation = state.pose.getRotation();
 
-        state.imu.pitch = imu.getPitch();
-        state.imu.roll = imu.getRoll();
+        state.pitch = imu.getPitch();
+        state.roll = imu.getRoll();
 
         imuSimHook.accept(state.speeds);
     }
@@ -180,6 +173,7 @@ public class SwerveAPI implements AutoCloseable {
         try {
             poseEstimator.resetPosition(odometryThread.lastYaw, state.modules.positions, pose);
             state.pose = poseEstimator.getEstimatedPosition();
+            odometryThread.poseHistory.clear();
         } finally {
             odometryMutex.unlock();
         }
@@ -194,10 +188,16 @@ public class SwerveAPI implements AutoCloseable {
     public void tareRotation(Perspective perspective) {
         var rotation = perspective.getTareRotation();
         if (rotation == null) return;
+
         odometryMutex.lock();
         try {
+            // Patch for an upstream bug.
+            // TODO PR a proper fix to PoseEstimator.resetRotation()
+            odometry.resetPose(state.pose);
+
             poseEstimator.resetRotation(rotation);
             state.pose = poseEstimator.getEstimatedPosition();
+            odometryThread.poseHistory.clear();
         } finally {
             odometryMutex.unlock();
         }
@@ -233,7 +233,9 @@ public class SwerveAPI implements AutoCloseable {
      * @param x The X value of the driver's joystick, from {@code [-1.0, 1.0]}.
      * @param y The Y value of the driver's joystick, from {@code [-1.0, 1.0]}.
      * @param angular The CCW+ angular speed to apply, from {@code [-1.0, 1.0]}.
-     * @param assist Additional velocities to apply.
+     * @param assist Additional velocities to apply. Note that these speeds are
+     *               relative to the provided perspective, and are still restricted
+     *               by the ratelimiter if it is active.
      * @param perspective The forward perspective for the chassis speeds.
      * @param discretize If the generated speeds should be discretized.
      * @param ratelimit If the robot's acceleration should be constrained.
@@ -444,7 +446,7 @@ public class SwerveAPI implements AutoCloseable {
 
     /**
      * Represents a measurement from vision to apply to the pose estimator.
-     * @see {@link SwerveDrivePoseEstimator#addVisionMeasurement(Pose2d, double, Matrix)}.
+     * @see {@link PoseEstimator#addVisionMeasurement(Pose2d, double, Matrix)}.
      */
     @Logged(strategy = Strategy.OPT_IN)
     public static final record VisionMeasurement(Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {
@@ -458,9 +460,9 @@ public class SwerveAPI implements AutoCloseable {
     }
 
     /**
-     * Contains a yaw measurement alongside the timestamp of the measurement, in seconds.
+     * Contains a {@link Pose2d} alongside a timestamp in seconds.
      */
-    public static final record TimestampedYaw(Rotation2d yaw, double timestamp) {}
+    public static final record TimestampedPose(Pose2d pose, double timestamp) {}
 
     /**
      * Manages swerve odometry. Will run asynchronously at the configured odometry update
@@ -471,7 +473,7 @@ public class SwerveAPI implements AutoCloseable {
      */
     private final class SwerveOdometryThread implements AutoCloseable {
 
-        public final List<TimestampedYaw> yawMeasurements = new ArrayList<>();
+        public final List<TimestampedPose> poseHistory = new ArrayList<>();
         public Rotation2d lastYaw = Rotation2d.kZero;
         public boolean timesync = false;
         public int successes = 0;
@@ -542,7 +544,8 @@ public class SwerveAPI implements AutoCloseable {
                 }
 
                 poseEstimator.update(lastYaw, positionCache);
-                yawMeasurements.add(new TimestampedYaw(odometry.getPoseMeters().getRotation(), yawTimestamp));
+                poseHistory.add(new TimestampedPose(poseEstimator.getEstimatedPosition(), yawTimestamp));
+
                 successes++;
             } finally {
                 odometryMutex.unlock();
