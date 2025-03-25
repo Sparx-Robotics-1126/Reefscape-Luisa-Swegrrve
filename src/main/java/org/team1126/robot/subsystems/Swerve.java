@@ -14,7 +14,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.BooleanSupplier;
@@ -120,7 +122,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
     private static final TunableDouble kReefAssistTolerance = Tunable.doubleValue("swerve/kReefAssistTolerance", 1.3);
     private static final TunableDouble kFacingReefTolerance = Tunable.doubleValue("swerve/kFacingReefTolerance", 1.0);
     private static final TunableDouble kReefDangerDistance = Tunable.doubleValue("swerve/kReefDangerDistance", 0.6);
-    private static final TunableDouble kReefHappyDistance = Tunable.doubleValue("swerve/kReefHappyDistance", 3.0);
+    private static final TunableDouble kReefHappyDistance = Tunable.doubleValue("swerve/kReefHappyDistance", 0.7);
 
 
     private final SwerveAPI api;
@@ -209,6 +211,8 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
             reefAngle.rotateBy(Rotation2d.kPi).minus(reefTranslation.getAngle()).getCos() * reefTranslation.getNorm() -
             FieldConstants.kReefCenterToWallDistance
         );
+
+        SmartDashboard.putBoolean("happyGOose", inRange());
     }
 
     /**
@@ -358,7 +362,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
                     state.rotation.getRadians(),
                     reefReference.getRotation().getRadians());
 
-               if(reefAssist.targetPipe.getTranslation().getDistance(state.translation) < kAutoDriveTolerance.value()) {
+               if(reefAssist.targetPipe.getTranslation().getDistance(state.translation) < kAutoDriveTolerance.value() || DriverStation.isAutonomous()) {
                 var assist =
                         new ChassisSpeeds(
                             (Alliance.isRed() ? -1 : 1) * reefPIDx.calculate(state.pose.getX(), reefAssist.targetPipe.getX()),

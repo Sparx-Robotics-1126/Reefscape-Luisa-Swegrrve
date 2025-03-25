@@ -99,14 +99,13 @@ private AutoRoutine moveTestAutoRoutine(boolean mirror){
 
     );
 
-    routine.observe(placer::bottomHasCoral).onTrue(routines.placeL4(arm, extension, placer));
-    
-    part1.atTime(1).onTrue(routines.driveToCoral(mirror));
-
-    // part1.chain(part2);
-    // part2.atTime(1).onTrue(routines.toCoral(arm, extension).withTimeout(3));
-
-
+    routine.observe(placer::bottomHasCoral).onTrue(routines.placeL4(arm, extension, placer).withTimeout(2));
+    part1.active().onTrue(routines.toL4(arm, extension).withTimeout(4));
+    part1.atTime(1.2).onTrue(routines.driveToCoral(false).withTimeout(2));
+    System.out.println("going to part 2");
+    part1.chain(part2);
+    System.out.println("after");
+    part2.active().onTrue(routines.toCoral(arm, extension).withTimeout(3));
 
     return routine;
 }
@@ -129,7 +128,7 @@ private AutoRoutine l4Straight(boolean mirror) {
     );
     
     routines.toL4(arm, extension).withTimeout(1);
-    straightPath.atTime(1).whileTrue(routines.driveToCoral(mirror));
+    straightPath.atTime(5).whileTrue(routines.driveToCoral(mirror));
     straightPath.active().onTrue(routines.toL4(arm, extension).withTimeout(3).andThen(routines.placeL4(arm, extension, placer).withTimeout(1)));
 
 
