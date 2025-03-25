@@ -42,6 +42,7 @@ public final class Routines {
     private final ArmSubsystem arm;
     private final ExtensionSubsystem extension;
     private final Swerve swerve;
+    private final PlacerSubsystem placer;
 
     private final ReefSelection selection;
 
@@ -51,6 +52,7 @@ public final class Routines {
         selection = robot.selection;
         arm = robot.arm;
         extension = robot.extension;
+        placer = robot.placer;
     }
 
     public Command driveToCoral(boolean isRight) {
@@ -59,6 +61,12 @@ public final class Routines {
             swerve.driveReef(robot::driverX, robot::driverY, robot::driverAngular, selection::isLeft).withTimeout(4)
         );
     }
+
+public Command safe(BooleanSupplier button){
+    return deadline(  new MoveExtensionToPos(extension, arm,.01),
+                    new MoveArmToAngle(arm, 18.442849922180176))
+    .withName("Routines.safe()");
+}
 
     public Command toL4(ArmSubsystem arm, ExtensionSubsystem extension) {
 

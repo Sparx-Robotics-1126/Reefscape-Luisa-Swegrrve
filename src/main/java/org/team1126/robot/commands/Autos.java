@@ -110,6 +110,44 @@ private AutoRoutine moveTestAutoRoutine(boolean mirror){
     return routine;
 }
 
+private AutoRoutine moveKKTestAutoRoutine(boolean mirror){
+    //System.out.println("Creating Move Test Auto Routine");
+    AutoRoutine routine = factory.newRoutine("Right l4 (1)");
+
+    AutoTrajectory part1 = routine.trajectory("Right l4 (1)", mirror);
+    AutoTrajectory part2 = routine.trajectory("Right l4 (2)", mirror);
+
+    routine
+    .active()
+    .onTrue(
+        sequence(
+            parallel(
+                part1.resetOdometry(),
+                swerve.resetAutoPID()
+            ),
+            part1.spawnCmd()
+        )
+
+    );
+
+    Trigger toIntake = routine.anyActive(part2);
+    Trigger startPlacer = part2.atTime(1);
+
+    startPlacer.onTrue(routines.safe(() -> true)); //moves are to for coral station
+    routine.observe(placer::bottomHasCoral).onTrue(routines.placeL4(arm, extension, placer).withTimeout(2));
+   
+    part1.active().onTrue(routines.toL4(arm, extension).withTimeout(4));
+    // part1.atTime(1.2).onTrue(routines.driveToCoral(false).withTimeout(2));
+    System.out.println("going to part 2");
+    part1.chain(part2);
+    part2.done().onTrue(waitUntil(placer::bottomHasCoral)); //.andThen(next movement)
+    System.out.println("after");
+    // part2.active().onTrue(routines.toCoral(arm, extension).withTimeout(3));
+
+    return routine;
+}
+
+
 private AutoRoutine l4Straight(boolean mirror) {
     AutoRoutine routine = factory.newRoutine("StraightPath");
 

@@ -191,5 +191,7 @@ public final class Robot extends TimedRobot {
     @Override
     public void testPeriodic() {}
 
-
+    public boolean safeForCoralStation() {
+        return !placer.bottomHasCoral() && swerve.wildlifeConservationProgram();
+    }
 }
