@@ -10,7 +10,10 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.team1126.robot.Robot;
 import org.team1126.robot.Constants.ArmConstants;
@@ -142,6 +145,64 @@ private AutoRoutine moveKKTestAutoRoutine(boolean mirror){
     part1.chain(part2);
     part2.done().onTrue(waitUntil(placer::bottomHasCoral)); //.andThen(next movement)
     System.out.println("after");
+    // part2.active().onTrue(routines.toCoral(arm, extension).withTimeout(3));
+
+    return routine;
+}
+
+private AutoRoutine anotherMoveTestAutoRoutine(boolean mirror){
+    //System.out.println("Creating Move Test Auto Routine");
+    AutoRoutine routine = factory.newRoutine("Right l4 (1)");
+
+    AutoTrajectory part1 = routine.trajectory("Right l4 (1)", mirror);
+    //might need a small backup command to move away from reef
+    AutoTrajectory part2 = routine.trajectory("Right l4 (2)", mirror);
+
+    routine
+    .active()
+    .onTrue(
+        sequence(
+            parallel(
+                part1.resetOdometry(),
+                swerve.resetAutoPID()
+            ),
+            part1.spawnCmd(),
+            Commands.print("move to right L4 started")
+        )
+
+    );
+
+
+    part1.done()
+    .onTrue(
+        Commands.sequence(
+            routines.driveToCoral(false), 
+            routines.toL4(arm, extension).withTimeout(2),
+           
+           Commands.parallel(part2.spawnCmd(), routines.toCoral(arm, extension)) //might need to work on timing for arm
+    ));
+
+
+    part2
+    .done()
+    .onTrue(Commands.sequence(
+        new InstantCommand(() -> swerve.stop(false)),
+        Commands.race(
+            Commands.parallel(
+                routines.toCoral(arm, extension),
+                new WaitUntilCommand(() -> placer.bottomHasCoral())
+            ),
+            Commands.waitSeconds(.5))
+
+        )
+    );
+
+    // routine.observe(placer::bottomHasCoral).onTrue(routines.placeL4(arm, extension, placer).withTimeout(2));
+    // part1.active().onTrue(routines.toL4(arm, extension).withTimeout(4));
+    // part1.atTime(1.2).onTrue(routines.driveToCoral(false).withTimeout(2));
+    // System.out.println("going to part 2");
+    // part1.chain(part2);
+    // System.out.println("after");
     // part2.active().onTrue(routines.toCoral(arm, extension).withTimeout(3));
 
     return routine;
