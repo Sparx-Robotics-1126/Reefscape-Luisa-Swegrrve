@@ -137,7 +137,7 @@ private AutoRoutine moveKKTestAutoRoutine(boolean mirror){
     routine.observe(placer::bottomHasCoral).onTrue(routines.placeL4(arm, extension, placer).withTimeout(2));
    
     part1.active().onTrue(routines.toL4(arm, extension).withTimeout(4));
-    // part1.atTime(1.2).onTrue(routines.driveToCoral(false).withTimeout(2));
+    part1.atTime(1.2).onTrue(routines.driveToCoral(false).withTimeout(2));
     System.out.println("going to part 2");
     part1.chain(part2);
     part2.done().onTrue(waitUntil(placer::bottomHasCoral)); //.andThen(next movement)
