@@ -17,7 +17,10 @@ import org.team1126.robot.Constants.ExtensionConstants;
 import org.team1126.robot.commands.arm.MoveArmToAngle;
 import org.team1126.robot.commands.arm.MoveExtHome;
 import org.team1126.robot.commands.arm.MoveExtensionToPos;
+import org.team1126.robot.commands.placer.AcquireCoral;
+import org.team1126.robot.commands.placer.IngestCoral;
 import org.team1126.robot.commands.placer.PlaceCoral;
+import org.team1126.robot.commands.placer.PositionCoral;
 import org.team1126.robot.subsystems.ArmSubsystem;
 import org.team1126.robot.subsystems.ExtensionSubsystem;
 // import org.team1126.robot.subsystems.Climber;
@@ -84,7 +87,6 @@ public Command safe(BooleanSupplier button){
                 new MoveExtensionToPos(extension, arm, ExtensionConstants.L4_EXT_POS),
                 sequence (
                     waitUntil(swerve::inRange),
-                    new WaitCommand(1),
                     new PlaceCoral(placer, .3).withTimeout(1)
                 )
                 
@@ -104,6 +106,12 @@ public Command safe(BooleanSupplier button){
         return parallel(
             new MoveArmToAngle(arm, 18.442849922180176),
             new MoveExtensionToPos(extension, arm, .01)
+        );
+    }
+    public Command intakeCoral(PlacerSubsystem placer) {
+        return sequence(
+            new IngestCoral(placer, -0.5),
+            new PositionCoral(placer)
         );
     }
 

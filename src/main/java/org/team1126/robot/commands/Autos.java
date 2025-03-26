@@ -63,12 +63,12 @@ public final class Autos {
         chooser = new AutoChooser();
 
         // Add autonomous modes to the dashboard
-        chooser.addRoutine("Move Test", () -> moveTestAutoRoutine(false));
-        chooser.addRoutine("J start test", () -> JTest(false));
-        chooser.addRoutine("Forward l4", () -> l4Straight(false));
-        // chooser.addRoutine("Right L4 x3 (Hopper)", () -> l4x3Hopper(true));
-        // chooser.addRoutine("Left L4 x3 (Baby Bird)", () -> l4x3BabyBird(false));
-        // chooser.addRoutine("Right L4 x3 (Baby Bird)", () -> l4x3BabyBird(true));
+        chooser.addRoutine("Forward L4", () -> L4Straight(false));
+        chooser.addRoutine("2 Note RIGHT", () -> anotherMoveTestAutoRoutine(false));
+        chooser.addRoutine("2 Note LEFT", () -> anotherMoveTestAutoRoutine(true));
+        // chooser.addRoutine("Right L x3 (Hopper)", () -> Lx3Hopper(true));
+        // chooser.addRoutine("Left L x3 (Baby Bird)", () -> Lx3BabyBird(false));
+        // chooser.addRoutine("Right L x3 (Baby Bird)", () -> Lx3BabyBird(true));
         SmartDashboard.putData("autos", chooser);
     }
 
@@ -84,10 +84,10 @@ public final class Autos {
 
 private AutoRoutine moveTestAutoRoutine(boolean mirror){
     //System.out.println("Creating Move Test Auto Routine");
-    AutoRoutine routine = factory.newRoutine("Right l4 (1)");
+    AutoRoutine routine = factory.newRoutine("Right L4 (1)");
 
-    AutoTrajectory part1 = routine.trajectory("Right l4 (1)", mirror);
-    AutoTrajectory part2 = routine.trajectory("Right l4 (2)", mirror);
+    AutoTrajectory part1 = routine.trajectory("Right L4 (1)", mirror);
+    AutoTrajectory part2 = routine.trajectory("Right L4 (2)", mirror);
 
     routine
     .active()
@@ -113,50 +113,15 @@ private AutoRoutine moveTestAutoRoutine(boolean mirror){
     return routine;
 }
 
-private AutoRoutine moveKKTestAutoRoutine(boolean mirror){
-    //System.out.println("Creating Move Test Auto Routine");
-    AutoRoutine routine = factory.newRoutine("Right l4 (1)");
-
-    AutoTrajectory part1 = routine.trajectory("Right l4 (1)", mirror);
-    AutoTrajectory part2 = routine.trajectory("Right l4 (2)", mirror);
-
-    routine
-    .active()
-    .onTrue(
-        sequence(
-            parallel(
-                part1.resetOdometry(),
-                swerve.resetAutoPID()
-            ),
-            part1.spawnCmd()
-        )
-
-    );
-
-    Trigger toIntake = routine.anyActive(part2);
-    Trigger startPlacer = part2.atTime(1);
-
-    startPlacer.onTrue(routines.safe(() -> true)); //moves are to for coral station
-    routine.observe(placer::bottomHasCoral).onTrue(routines.placeL4(arm, extension, placer).withTimeout(2));
-   
-    part1.active().onTrue(routines.toL4(arm, extension).withTimeout(4));
-    part1.atTime(1.2).onTrue(routines.driveToCoral(false).withTimeout(2));
-    System.out.println("going to part 2");
-    part1.chain(part2);
-    part2.done().onTrue(waitUntil(placer::bottomHasCoral)); //.andThen(next movement)
-    System.out.println("after");
-    // part2.active().onTrue(routines.toCoral(arm, extension).withTimeout(3));
-
-    return routine;
-}
-
 private AutoRoutine anotherMoveTestAutoRoutine(boolean mirror){
     //System.out.println("Creating Move Test Auto Routine");
-    AutoRoutine routine = factory.newRoutine("Right l4 (1)");
+    AutoRoutine routine = factory.newRoutine("Right L4 (1)");
 
-    AutoTrajectory part1 = routine.trajectory("Right l4 (1)", mirror);
+    AutoTrajectory part1 = routine.trajectory("Right L4 (1)", mirror);
     //might need a small backup command to move away from reef
-    AutoTrajectory part2 = routine.trajectory("Right l4 (2)", mirror);
+    AutoTrajectory part2 = routine.trajectory("Right L4 (2)", mirror);
+    AutoTrajectory part3 = routine.trajectory("Right L4 (3)", mirror);
+    AutoTrajectory part4 = routine.trajectory("Right L4 (4)", mirror);
 
     routine
     .active()
@@ -165,51 +130,73 @@ private AutoRoutine anotherMoveTestAutoRoutine(boolean mirror){
             parallel(
                 part1.resetOdometry(),
                 swerve.resetAutoPID()
+                
             ),
             part1.spawnCmd(),
-            Commands.print("move to right L4 started")
+            Commands.print("move to right L started")
         )
 
     );
 
-
+    // part1.active()
+    // .onTrue(
+    //     routines.toL4(arm, extension)
+    // );
+    part1.atTime(.6).onTrue(routines.toL4(arm, extension));
     part1.done()
     .onTrue(
         Commands.sequence(
-            routines.driveToCoral(false), 
-            routines.toL4(arm, extension).withTimeout(2),
-           
-           Commands.parallel(part2.spawnCmd(), routines.toCoral(arm, extension)) //might need to work on timing for arm
+            parallel(
+                routines.driveToCoral(false).withTimeout(1.5),
+                routines.toL4(arm, extension).withTimeout(1.5)
+                ),
+                
+                Commands.sequence(routines.placeL4(arm, extension, placer)).withTimeout(1),
+                Commands.parallel(part2.spawnCmd()) //might need to work on timing for arm
     ));
 
-
-    part2
-    .done()
-    .onTrue(Commands.sequence(
-        new InstantCommand(() -> swerve.stop(false)),
-        Commands.race(
+    part2.active().onTrue(sequence(Commands.waitSeconds(1),routines.toCoral(arm, extension).withTimeout(2)));
+    part2.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> swerve.stop(false)),
             Commands.parallel(
                 routines.toCoral(arm, extension),
-                new WaitUntilCommand(() -> placer.bottomHasCoral())
+                Commands.sequence(
+                    routines.intakeCoral(placer),
+                    new WaitUntilCommand( () -> placer.coralClear()),
+                    Commands.print("HERE!!!!!!!!!!!"),
+                    part3.spawnCmd()
+                    
+                )
+
             ),
-            Commands.waitSeconds(.5))
+            Commands.parallel(
+                
+            )
+            )
+            
+        );
 
-        )
-    );
+    part3.atTime(.5).onTrue(routines.toL4(arm, extension));
+    part3.done()
+    .onTrue(
+        Commands.sequence(
+            parallel(
+                routines.driveToCoral(false).withTimeout(1.5),
+                routines.toL4(arm, extension).withTimeout(1.5)
+                ),
+                
+                Commands.sequence(routines.placeL4(arm, extension, placer)).withTimeout(2),
+                Commands.parallel(part4.spawnCmd())
+    ));
 
-    // routine.observe(placer::bottomHasCoral).onTrue(routines.placeL4(arm, extension, placer).withTimeout(2));
-    // part1.active().onTrue(routines.toL4(arm, extension).withTimeout(4));
-    // part1.atTime(1.2).onTrue(routines.driveToCoral(false).withTimeout(2));
-    // System.out.println("going to part 2");
-    // part1.chain(part2);
-    // System.out.println("after");
-    // part2.active().onTrue(routines.toCoral(arm, extension).withTimeout(3));
+    part4.atTime(.5).onTrue(routines.toCoral(arm, extension));
 
     return routine;
 }
 
 
-private AutoRoutine l4Straight(boolean mirror) {
+private AutoRoutine L4Straight(boolean mirror) {
     AutoRoutine routine = factory.newRoutine("StraightPath");
 
     AutoTrajectory straightPath = routine.trajectory("StraightPath", mirror);
@@ -230,28 +217,7 @@ private AutoRoutine l4Straight(boolean mirror) {
     straightPath.atTime(5).whileTrue(routines.driveToCoral(mirror));
     straightPath.active().onTrue(routines.toL4(arm, extension).withTimeout(3).andThen(routines.placeL4(arm, extension, placer).withTimeout(1)));
 
-
     return routine;
 }
-
-private AutoRoutine JTest(boolean mirror){
-    AutoRoutine routine = factory.newRoutine("Start-J");
-
-    AutoTrajectory testPath = routine.trajectory("Start-J", mirror);
-
-    routine
-    .active()
-    .onTrue(
-        sequence(
-            parallel(
-                swerve.resetAutoPID()
-            ),
-            testPath.spawnCmd()
-        )
-    );
-
-    return routine;
-}
-
      
 }

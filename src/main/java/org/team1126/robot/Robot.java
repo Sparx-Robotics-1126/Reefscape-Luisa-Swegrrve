@@ -191,6 +191,12 @@ public final class Robot extends TimedRobot {
     @Override
     public void testPeriodic() {}
 
+    @Override
+    public void teleopInit() {
+          CommandScheduler.getInstance().cancelAll();
+        
+    }
+
     public boolean safeForCoralStation() {
         return !placer.bottomHasCoral() && swerve.wildlifeConservationProgram();
     }
