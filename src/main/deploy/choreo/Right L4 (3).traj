@@ -9,7 +9,7 @@
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
-    {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":0.035881996154785156, "y":-5.960464477539064e-8, "w":17.548, "h":8.052}}, "enabled":false},
+    {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":0.035881996154785156, "y":-5.960464477539065e-8, "w":17.548, "h":8.052}}, "enabled":false},
     {"from":0, "to":1, "data":{"type":"MaxAngularVelocity", "props":{"max":0.0}}, "enabled":true},
     {"from":0, "to":2, "data":{"type":"MaxAcceleration", "props":{"max":1.2}}, "enabled":true},
     {"from":0, "to":2, "data":{"type":"MaxVelocity", "props":{"max":1.2}}, "enabled":true}],
