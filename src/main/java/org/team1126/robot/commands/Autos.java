@@ -66,7 +66,7 @@ public final class Autos {
         chooser.addRoutine("Forward L4", () -> L4Straight(false));
         chooser.addRoutine("2 Note RIGHT", () -> anotherMoveTestAutoRoutine(false));
         chooser.addRoutine("2 Note LEFT", () -> anotherMoveTestAutoRoutine(true));
-        chooser.addRoutine("StraightTest", () -> L4Test(false));
+        chooser.addRoutine("Move Straight", () -> L4Test(false));
         // chooser.addRoutine("Right L x3 (Hopper)", () -> Lx3Hopper(true));
         // chooser.addRoutine("Left L x3 (Baby Bird)", () -> Lx3BabyBird(false));
         // chooser.addRoutine("Right L x3 (Baby Bird)", () -> Lx3BabyBird(true));
@@ -149,8 +149,11 @@ private AutoRoutine anotherMoveTestAutoRoutine(boolean mirror){
     .onTrue(
         Commands.sequence(
             parallel(
-                routines.driveToCoral(false).withTimeout(1.5),
-                routines.toL4(arm, extension).withTimeout(1.5)
+                sequence(
+                    routines.driveToCoral(false).withTimeout(1),
+                    routines.driveToCoral(false).withTimeout(1.5)
+                    ),
+                    routines.toL4(arm, extension).withTimeout(2)
                 ),
                 
                 Commands.sequence(routines.placeL4(arm, extension, placer)).withTimeout(1),
@@ -211,8 +214,9 @@ private AutoRoutine L4Straight(boolean mirror) {
         )
     );
     
+    
     routines.toL4(arm, extension).withTimeout(1);
-    straightPath.atTime(5).whileTrue(routines.driveToCoral(mirror));
+    straightPath.atTime(2).whileTrue(routines.driveToCoral(mirror).withTimeout(2));
     straightPath.active().onTrue(routines.toL4(arm, extension).withTimeout(3).andThen(routines.placeL4(arm, extension, placer).withTimeout(1)));
 
     return routine;
@@ -236,13 +240,13 @@ private AutoRoutine L4Test(boolean mirror) {
         )
     );
     
-    //routines.toL4(arm, extension).withTimeout(1);
+    // //routines.toL4(arm, extension).withTimeout(1);
 
-    straightPath.atTime(.6).onTrue(routines.toCoral(arm, extension));
-    straightPath.atTime(.75).onTrue(routines.toL4(arm, extension));
+    // straightPath.atTime(.6).onTrue(routines.toCoral(arm, extension));
+    // straightPath.atTime(.75).onTrue(routines.toL4(arm, extension));
     
-    straightPath.atTime(5).whileTrue(routines.driveToCoral(mirror));
-    straightPath.active().onTrue(routines.toL4(arm, extension).withTimeout(3).andThen(routines.placeL4(arm, extension, placer).withTimeout(1)));
+    // straightPath.atTime(5).whileTrue(routines.driveToCoral(mirror));
+    // straightPath.active().onTrue(routines.toL4(arm, extension).withTimeout(3).andThen(routines.placeL4(arm, extension, placer).withTimeout(1)));
 
     return routine;
 
