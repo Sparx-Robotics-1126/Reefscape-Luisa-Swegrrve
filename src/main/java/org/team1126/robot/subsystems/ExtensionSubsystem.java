@@ -18,20 +18,62 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.lang.module.ModuleDescriptor.Requires;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import org.team1126.lib.util.Math2;
+import org.team1126.lib.util.Mutable;
+import org.team1126.lib.util.Tunable;
+import org.team1126.lib.util.Tunable.TunableDouble;
+import org.team1126.lib.util.command.GRRSubsystem;
 import org.team1126.robot.Constants.ArmConstants;
+import org.team1126.robot.Robot;
 
-public class ExtensionSubsystem extends SubsystemBase {
 
-    /** Subsystem-wide setpoints */
-    public enum Setpoint {
-        kFeederStation,
-        kLevel1,
-        kLevel2,
-        kLevel3,
-        kLevel4;
+public final class ExtensionSubsystem extends GRRSubsystem {
+
+   
+    public static enum ExtensionPosition {
+        kHome(0.01),
+        kFeederStation(0.01),
+        kLevel1(0.013659),
+        kLevel2(-0.1431989),
+        kLevel3(-0.2),
+        kLevel4(-0.55);
+
+        private final TunableDouble position;
+
+        private ExtensionPosition(double position) {
+            this.position = Tunable.doubleValue("extension/positions/" + name(), position);
+        }
+
+        public double rotations() {
+            return position.value();
+        }
+
+        private static ExtensionPosition closeTo(double position) {
+            ExtensionPosition closest = null;
+            double min = Double.MAX_VALUE;
+            for (ExtensionPosition option : values()) {
+                double distance = Math.abs(option.rotations() - position);
+                if (Math2.epsilonEquals(0.0, distance, kCloseToTolerance.value()) && distance <= min) {
+                    closest = option;
+                    min = distance;
+                }
+            }
+
+            return closest;
+        }
     }
 
+
+    private static final TunableDouble kCloseToTolerance = Tunable.doubleValue("elevator/kCloseToTolerance", 0.35);
+    
     private SparkMax extension;
+    private final Robot robot;
     private SparkClosedLoopController extensionController;
 
     private RelativeEncoder extensionEncoder;
@@ -58,6 +100,7 @@ public class ExtensionSubsystem extends SubsystemBase {
                     kElevatorkA);
 
     public ExtensionSubsystem() {
+        
 //   if (!RobotBase.isSimulation()){
 
         extension = new SparkMax(ArmConstants.ELEVATOR_ID, MotorType.kBrushless);
@@ -160,6 +203,30 @@ public class ExtensionSubsystem extends SubsystemBase {
     
        
     }
+  /**
+     * Goes to a position.
+     * @param position The position to go to.
+     * @param safe If the elevator is safe to move.
+     */
+    public Command goTo(ExtensionPosition position, BooleanSupplier safe) {
+        return goTo(() -> position, () -> 0.0, safe);
+    }
+    /**
+     * Goes to a position.
+     * @param position The position to go to.
+     * @param safe If the elevator is safe to move.
+     */
+    private Command goTo(Supplier<ExtensionPosition> position, DoubleSupplier fudge, BooleanSupplier safe) {
+        Mutable<Double> holdPosition = new Mutable<>(-1.0);
 
-    
+        return commandBuilder("Extension.goTo()")
+            .onInitialize(() -> holdPosition.value = -1.0)
+            .onExecute(() -> {
+                if(robot.safeForExtension()){
+                    if(Math.abs(targetExtension) > 0) {
+                        this.extReachGoal(targetExtension);
+                    }
+                }
+            });
+    }
 }

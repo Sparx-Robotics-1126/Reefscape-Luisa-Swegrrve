@@ -26,7 +26,7 @@ public class ArmSubsystem extends SubsystemBase {
     /**
      * Subsystem-wide setpoints
      */
-    public enum Setpoint {
+    public static enum Setpoint {
         kFeederStation,
         kLevel1,
         kLevel2,

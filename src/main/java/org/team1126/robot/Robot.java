@@ -200,4 +200,12 @@ public final class Robot extends TimedRobot {
     public boolean safeForCoralStation() {
         return !placer.bottomHasCoral() && swerve.wildlifeConservationProgram();
     }
+
+    public  double getArmPosition() {
+        return arm.getArmAngle();
+    }
+
+    public boolean safeForExtension() {
+        return arm.getArmAngle() > 7.5;
+    }
 }
