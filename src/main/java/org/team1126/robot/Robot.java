@@ -115,7 +115,7 @@ public final class Robot extends TimedRobot {
         // Operator bindings
         operator.povDown().whileTrue(new MoveArmToAngle(arm, 0).alongWith(new MoveExtensionToPos(extension, arm, 0.01))); //arm home
         operator.povUp().whileTrue(new MoveArmToAngle(arm, 18.442849922180176).alongWith(new MoveExtensionToPos(extension, arm, .01))
-                  .alongWith(new IngestCoral(placer, -.7).andThen(new PositionCoral(placer))));                                                    //arm to coral station
+                  .alongWith(new IngestCoral(placer, -.8).andThen(new PositionCoral(placer))));                                                    //arm to coral station
 
         operator.a().whileTrue(new MoveArmToAngle(arm, ArmConstants.L1_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm, 0.013659)).alongWith(new ReefLights(leds,true, 1))); //arm l1
         operator.x().whileTrue(new MoveArmToAngle(arm, ArmConstants.L2_ARM_POS).alongWith(new MoveExtensionToPos(extension, arm,-0.1431989)).alongWith(new ReefLights(leds, true, 2))); //arm l2

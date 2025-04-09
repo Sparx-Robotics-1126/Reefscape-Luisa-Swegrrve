@@ -239,14 +239,43 @@ private AutoRoutine L4Test(boolean mirror) {
 
         )
     );
+
+    straightPath.active().onTrue(routines.toCoral(arm, extension).withTimeout(1));
+    straightPath.atTime(1).onTrue(routines.toL4(arm, extension));
     
     // //routines.toL4(arm, extension).withTimeout(1);
 
     // straightPath.atTime(.6).onTrue(routines.toCoral(arm, extension));
     // straightPath.atTime(.75).onTrue(routines.toL4(arm, extension));
-    
-    // straightPath.atTime(5).whileTrue(routines.driveToCoral(mirror));
-    // straightPath.active().onTrue(routines.toL4(arm, extension).withTimeout(3).andThen(routines.placeL4(arm, extension, placer).withTimeout(1)));
+
+    straightPath.active().onTrue(
+        sequence(
+            routines.toCoral(arm, extension).withTimeout(1),
+            routines.toL4(arm, extension).withTimeout(1)
+        )
+        
+    );
+    straightPath.done().onTrue(
+        sequence(
+            parallel(
+                routines.toL4(arm, extension),
+                routines.driveToCoral(false)
+            ).withTimeout(1),
+            parallel(
+                routines.toL4(arm, extension),
+                routines.driveToCoral(false)
+            ).withTimeout(1),
+            parallel(
+                routines.placeL4(arm, extension, placer)
+
+            ).withTimeout(3)
+            
+        )
+       
+
+    );
+    straightPath.atTime(3).whileTrue(routines.driveToCoral(mirror));
+    straightPath.active().onTrue(routines.toL4(arm, extension).withTimeout(3).andThen(routines.placeL4(arm, extension, placer).withTimeout(1)));
 
     return routine;
 
