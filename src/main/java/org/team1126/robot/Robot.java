@@ -43,6 +43,7 @@ import org.team1126.robot.subsystems.ExtensionSubsystem;
 import org.team1126.robot.subsystems.LEDs;
 import org.team1126.robot.subsystems.PlacerSubsystem;
 import org.team1126.robot.subsystems.Swerve;
+import org.team1126.robot.subsystems.ExtensionSubsystem.ExtensionPosition;
 import org.team1126.robot.util.ReefSelection;
 
 @Logged
@@ -79,7 +80,7 @@ public final class Robot extends TimedRobot {
 
         // Initialize subsystems
         climber = new ClimbSubsystem();
-        extension = new ExtensionSubsystem();
+        extension = new ExtensionSubsystem(this);
         arm = new ArmSubsystem();
         placer = new PlacerSubsystem();
         swerve = new Swerve();
@@ -113,7 +114,7 @@ public final class Robot extends TimedRobot {
         driver.leftTrigger().onTrue(swerve.tareRotation());
 
         // Operator bindings
-        operator.povDown().whileTrue(new MoveArmToAngle(arm, 0).alongWith(new MoveExtensionToPos(extension, arm, 0.01))); //arm home
+        operator.povDown().whileTrue(new MoveArmToAngle(arm, 0).alongWith(extension.goTo(ExtensionPosition.kHome,  this::safeForExtension) )); //arm home
         operator.povUp().whileTrue(new MoveArmToAngle(arm, 18.442849922180176).alongWith(new MoveExtensionToPos(extension, arm, .01))
                   .alongWith(new IngestCoral(placer, -.8).andThen(new PositionCoral(placer))));                                                    //arm to coral station
 
