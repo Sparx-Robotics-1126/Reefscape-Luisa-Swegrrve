@@ -38,7 +38,7 @@ public final class ExtensionSubsystem extends GRRSubsystem {
    
     public static enum ExtensionPosition {
         kHome(0.01),
-        kFeederStation(0.01),
+        kCoralStation(0.01),
         kLevel1(0.013659),
         kLevel2(-0.1431989),
         kLevel3(-0.2),
@@ -50,7 +50,7 @@ public final class ExtensionSubsystem extends GRRSubsystem {
             this.position = Tunable.doubleValue("extension/positions/" + name(), position);
         }
 
-        public double rotations() {
+        public double position() {
             return position.value();
         }
 
@@ -58,7 +58,7 @@ public final class ExtensionSubsystem extends GRRSubsystem {
             ExtensionPosition closest = null;
             double min = Double.MAX_VALUE;
             for (ExtensionPosition option : values()) {
-                double distance = Math.abs(option.rotations() - position);
+                double distance = Math.abs(option.position() - position);
                 if (Math2.epsilonEquals(0.0, distance, kCloseToTolerance.value()) && distance <= min) {
                     closest = option;
                     min = distance;
@@ -70,8 +70,9 @@ public final class ExtensionSubsystem extends GRRSubsystem {
     }
 
 
-    private static final TunableDouble kCloseToTolerance = Tunable.doubleValue("elevator/kCloseToTolerance", 0.35);
-    
+    private static final TunableDouble kCloseToTolerance = Tunable.doubleValue("extension/kCloseToTolerance", 0.35);
+    private static final TunableDouble kZeroTolerance = Tunable.doubleValue("extension/kZeroTolerance", 0.15);
+
     private SparkMax extension;
     private final Robot robot;
     private SparkClosedLoopController extensionController;
@@ -99,8 +100,8 @@ public final class ExtensionSubsystem extends GRRSubsystem {
                     kElevatorkV,
                     kElevatorkA);
 
-    public ExtensionSubsystem() {
-        
+    public ExtensionSubsystem(Robot robot) {
+        this.robot = robot;
 //   if (!RobotBase.isSimulation()){
 
         extension = new SparkMax(ArmConstants.ELEVATOR_ID, MotorType.kBrushless);
@@ -217,15 +218,30 @@ public final class ExtensionSubsystem extends GRRSubsystem {
      * @param safe If the elevator is safe to move.
      */
     private Command goTo(Supplier<ExtensionPosition> position, DoubleSupplier fudge, BooleanSupplier safe) {
-        Mutable<Double> holdPosition = new Mutable<>(-1.0);
+        Mutable<Double> holdPosition = new Mutable<>(ExtensionPosition.kHome.position());
 
         return commandBuilder("Extension.goTo()")
-            .onInitialize(() -> holdPosition.value = -1.0)
+            .onInitialize(() -> holdPosition.value = ExtensionPosition.kHome.position())
             .onExecute(() -> {
-                if(robot.safeForExtension()){
-                    if(Math.abs(targetExtension) > 0) {
-                        this.extReachGoal(targetExtension);
+                double target = position.get().position();
+                double currentPosition = getExtension();
+
+                if (!safe.getAsBoolean()) {
+                    if (holdPosition.value < 0.0) {
+                        ExtensionPosition close = ExtensionPosition.closeTo(currentPosition);
+                        holdPosition.value = close != null ? close.position() : currentPosition;
                     }
+
+                    target = holdPosition.value;
+                } else {
+                    holdPosition.value = ExtensionPosition.kHome.position();
+                }
+
+                
+                if (currentPosition - kZeroTolerance.value() <= 0.0 && target - kZeroTolerance.value() <= 0.0) {
+                    this.stopExtension();
+                } else {
+                    this.extReachGoal(targetExtension);
                 }
             });
     }
