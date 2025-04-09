@@ -17,21 +17,42 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import org.team1126.lib.util.Mutable;
+import org.team1126.lib.util.Tunable;
+import org.team1126.lib.util.Tunable.TunableDouble;
+import org.team1126.lib.util.command.GRRSubsystem;
 import org.team1126.robot.Constants.ArmConstants;
 // import frc.robot.Constants.ArmConstants;
+import org.team1126.robot.subsystems.ExtensionSubsystem.ExtensionPosition;
 
 
-public class ArmSubsystem extends SubsystemBase {
+public class ArmSubsystem extends GRRSubsystem {
 
     /**
      * Subsystem-wide setpoints
      */
-    public static enum Setpoint {
-        kFeederStation,
-        kLevel1,
-        kLevel2,
-        kLevel3,
-        kLevel4;
+    public static enum ArmPosition {
+        kHome(0),
+        kCoralStation(18.442849922180176),
+        kLevel1(11.76196),
+        kLevel2(21.238),
+        kLevel3(26.5),
+        kLevel4(33.5);
+
+        private final TunableDouble position;
+
+        private ArmPosition(double position) {
+            this.position = Tunable.doubleValue("arm/positions/" + name(), position);
+        }
+
+        public double position() {
+            return position.value();
+        }
     }
 
 
@@ -176,6 +197,20 @@ public class ArmSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Arm position", getArmAngle());
         SmartDashboard.putNumber("Target Positon", targetAngle);
+    }
+
+    public Command goTo(ArmPosition position) {
+        return goTo(() -> position);
+    }
+
+    private Command goTo(Supplier<ArmPosition> position) {
+        Mutable<Double> holdPosition = new Mutable<>(ArmPosition.kHome.position());
+
+        return commandBuilder("Arm.goTo()")
+            .onInitialize(() -> holdPosition.value = ArmPosition.kHome.position())
+            .onExecute(() -> {
+                turnReachGoal(targetAngle);
+            });
     }
 
 }
