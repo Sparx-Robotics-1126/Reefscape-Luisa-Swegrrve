@@ -16,10 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.team1126.lib.util.Mutable;
@@ -28,7 +25,7 @@ import org.team1126.lib.util.Tunable.TunableDouble;
 import org.team1126.lib.util.command.GRRSubsystem;
 import org.team1126.robot.Constants.ArmConstants;
 // import frc.robot.Constants.ArmConstants;
-import org.team1126.robot.subsystems.ExtensionSubsystem.ExtensionPosition;
+import org.team1126.robot.Robot;
 
 
 public class ArmSubsystem extends GRRSubsystem {
@@ -59,6 +56,7 @@ public class ArmSubsystem extends GRRSubsystem {
     private SparkMax turnMotor;
     private SparkMax turnFollower; // follows turnMotor
     private SparkClosedLoopController turnController;
+    private final Robot robot;
 
     private DigitalInput homeSensor;
 
@@ -85,7 +83,8 @@ public class ArmSubsystem extends GRRSubsystem {
 
 //     ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(0.1, 0.1);
 
-    public ArmSubsystem() {
+    public ArmSubsystem(Robot robot) {
+        this.robot = robot;
         //   if (!RobotBase.isSimulation()){
 
         turnMotor = new SparkMax(ArmConstants.TURN_ONE_ID, MotorType.kBrushless);

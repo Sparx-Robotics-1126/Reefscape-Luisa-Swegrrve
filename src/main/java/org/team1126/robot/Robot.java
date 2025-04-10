@@ -43,6 +43,7 @@ import org.team1126.robot.subsystems.ExtensionSubsystem;
 import org.team1126.robot.subsystems.LEDs;
 import org.team1126.robot.subsystems.PlacerSubsystem;
 import org.team1126.robot.subsystems.Swerve;
+import org.team1126.robot.subsystems.ArmSubsystem.ArmPosition;
 import org.team1126.robot.subsystems.ExtensionSubsystem.ExtensionPosition;
 import org.team1126.robot.util.ReefSelection;
 
@@ -81,7 +82,7 @@ public final class Robot extends TimedRobot {
         // Initialize subsystems
         climber = new ClimbSubsystem();
         extension = new ExtensionSubsystem(this);
-        arm = new ArmSubsystem();
+        arm = new ArmSubsystem(this);
         placer = new PlacerSubsystem();
         swerve = new Swerve();
         leds = new LEDs(0, 300); // PORT IS PWM!!
@@ -114,26 +115,26 @@ public final class Robot extends TimedRobot {
         driver.leftTrigger().onTrue(swerve.tareRotation());
 
         // Operator bindings
-        operator.povDown().whileTrue(new MoveArmToAngle(arm, 0)
+        operator.povDown().whileTrue(arm.goTo(ArmPosition.kHome)
             .alongWith(extension.goTo(ExtensionPosition.kHome,  ()-> true) )); //arm home
 
-        operator.povUp().whileTrue(new MoveArmToAngle(arm, 18.442849922180176)
+        operator.povUp().whileTrue(arm.goTo(ArmPosition.kCoralStation)
             .alongWith(extension.goTo(ExtensionPosition.kCoralStation, this::safeForExtension))   //arm to coral station
             .alongWith(new IngestCoral(placer, -.8).andThen(new PositionCoral(placer))));                                                  
 
-        operator.a().whileTrue(new MoveArmToAngle(arm, ArmConstants.L1_ARM_POS)
+        operator.a().whileTrue(arm.goTo(ArmPosition.kLevel1)
             .alongWith(extension.goTo(ExtensionPosition.kLevel1, this::safeForExtension))
             .alongWith(new ReefLights(leds,true, 1))); //arm l1
 
-        operator.x().whileTrue(new MoveArmToAngle(arm, ArmConstants.L2_ARM_POS)
+        operator.x().whileTrue(arm.goTo(ArmPosition.kLevel2)
             .alongWith(extension.goTo(ExtensionPosition.kLevel2, this::safeForExtension))
             .alongWith(new ReefLights(leds, true, 2))); //arm l2
 
-        operator.b().whileTrue(new MoveArmToAngle(arm,  ArmConstants.L3_ARM_POS)
+        operator.b().whileTrue(arm.goTo(ArmPosition.kLevel3)
             .alongWith(extension.goTo(ExtensionPosition.kLevel3, this::safeForExtension))
             .alongWith(new ReefLights(leds, true, 3))); //arm l3
 
-        operator.y().whileTrue(new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS)
+        operator.y().whileTrue(arm.goTo(ArmPosition.kLevel4)
             .alongWith(extension.goTo(ExtensionPosition.kLevel4, this::safeForExtension))
             .alongWith(new ReefLights(leds,true, 4))); //arm l4
 
