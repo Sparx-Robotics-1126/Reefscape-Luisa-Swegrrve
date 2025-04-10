@@ -7,16 +7,58 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-
-// import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.team1126.robot.Constants.ClimbConstants;
 
-public class ClimbSubsystem extends SubsystemBase {
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import org.team1126.lib.util.Mutable;
+import org.team1126.lib.util.Tunable;
+import org.team1126.lib.util.Tunable.TunableDouble;
+import org.team1126.lib.util.command.GRRSubsystem;
+import org.team1126.robot.Constants.ClimbConstants;
+import org.team1126.robot.subsystems.ExtensionSubsystem.ExtensionPosition;
+
+public class ClimbSubsystem extends GRRSubsystem {
+
+    public static enum ClimberPosition {
+        kHome(0),
+        kOut(-112.55),
+        kIn(125);
+        
+
+         private final TunableDouble position;
+
+            private ClimberPosition(double position) {
+            this.position = Tunable.doubleValue("climber/positions/" + name(), position);
+        }
+
+        public double position() {
+            return position.value();
+        }
+
+        // private static ClimberPosition closeTo(double position) {
+        //     ClimberPosition closest = null;
+        //     double min = Double.MAX_VALUE;
+        //     for (ClimberPosition option : values()) {
+        //         double distance = Math.abs(option.position() - position);
+        //         if (Math2.epsilonEquals(0.0, distance, kCloseToTolerance.value()) && distance <= min) {
+        //             closest = option;
+        //             min = distance;
+        //         }
+        //     }
+
+        //     return closest;
+        // }
+    }
+
+    // private static final TunableDouble kCloseToTolerance = Tunable.doubleValue("climber/kCloseToTolerance", 0.35);
+    // private static final TunableDouble kZeroTolerance = Tunable.doubleValue("climber/kZeroTolerance", 0.15);
+
     private SparkMax climb;
 
     private RelativeEncoder climbEncoder;
@@ -113,5 +155,32 @@ public class ClimbSubsystem extends SubsystemBase {
 
     public boolean getBeachMode(){
         return beach;
+    }
+
+
+     /**
+     * Goes to a position.
+     * @param position The position to go to.
+     * @param safe If the climber is safe to move.
+     */
+    public Command goTo(ClimberPosition position) {
+        return goTo(() -> position, () -> 0.0);
+    }
+    /**
+     * Goes to a position.
+     * @param position The position to go to.
+     * @param safe If the climber is safe to move.
+     */
+    private Command goTo(Supplier<ClimberPosition> position, DoubleSupplier fudge) {
+        Mutable<Double> holdPosition = new Mutable<>(ClimberPosition.kHome.position());
+
+        return commandBuilder("Climber.goTo()")
+            .onInitialize(() -> holdPosition.value = ClimberPosition.kHome.position())
+            .onExecute(() -> {
+               
+            this.climbReachGoal(position.get().position());
+            this.setBeachMode(false);
+            })
+            .onEnd( ()->   moveClimb(0));
     }
 }

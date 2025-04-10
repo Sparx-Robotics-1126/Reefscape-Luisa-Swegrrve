@@ -1,5 +1,8 @@
 package org.team1126.robot.subsystems;
 
+import org.team1126.lib.util.command.CommandBuilder;
+import org.team1126.lib.util.command.GRRSubsystem;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -8,7 +11,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class LEDs extends SubsystemBase {
+public class LEDs extends GRRSubsystem {
     private final AddressableLED led;
     private final AddressableLEDBuffer ledBuffer;
     private int chaseIndex = 0;
@@ -102,4 +105,54 @@ public AddressableLEDBuffer getLedBuffer() {
             }
         });
     }
-}
+
+    public Command setReefLights(boolean isRight, int reefHeight){
+        int start = 0;
+        int end = this.getLedBuffer().getLength();
+
+        return commandBuilder("LEDs.setReefLights()")
+            .onInitialize(() -> {
+                if(isRight){
+                    if(reefHeight == 1){
+                        for (int i = start; i < end; i++) {
+                            setColor(i,255, 141, 0);
+                        }
+                    } else if(reefHeight == 2){
+                        for (int i = start; i < end; i++) {
+                            setColor(i,186, 255, 0);
+                        }
+                    } else if (reefHeight == 3){
+                        for (int i = start; i < end; i++) {
+                            setColor(i, 0, 255, 240);
+                        }
+                    } else if (reefHeight == 4){
+                        for (int i = start; i < end; i++) {
+                            setColor(i, 148, 0, 255);
+                        }
+                    } else if (reefHeight == 5) {
+                            setRainbow();
+                        
+                    }
+                } else {
+                    if (!DriverStation.getAlliance().isPresent()) {
+                        return;
+                    }
+                    if(DriverStation.getAlliance().get() == Alliance.Blue) {
+                        for(int i = 0; i < getLedBuffer().getLength(); i++)  {
+                            setColor(i, 0, 0, 255);
+                        }
+                    } else {
+                        for(int i = 0; i < getLedBuffer().getLength(); i++) {
+                            setColor(i, 255, 0, 0);
+                        }
+                    }
+                }
+            });
+        }
+
+
+
+    }
+
+
+  

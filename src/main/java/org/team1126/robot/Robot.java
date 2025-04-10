@@ -39,6 +39,7 @@ import org.team1126.robot.commands.placer.IngestCoral;
 import org.team1126.robot.commands.placer.PositionCoral;
 import org.team1126.robot.subsystems.ArmSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem;
+import org.team1126.robot.subsystems.ClimbSubsystem.ClimberPosition;
 import org.team1126.robot.subsystems.ExtensionSubsystem;
 import org.team1126.robot.subsystems.LEDs;
 import org.team1126.robot.subsystems.PlacerSubsystem;
@@ -93,7 +94,7 @@ public final class Robot extends TimedRobot {
         operator = new CommandXboxController(Constants.kOperator);
         
         swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));
-        leds.setDefaultCommand(new ReefLights(leds, false, 1126));
+        leds.setDefaultCommand(leds.setReefLights(false, 1126));
         // arm.setDefaultCommand(new ControllerMoveArm(()-> operator.getRawAxis(XboxController.Axis.kLeftY.value), arm));
        extension.setDefaultCommand(extension.setExtGoal( .03));
 
@@ -103,9 +104,9 @@ public final class Robot extends TimedRobot {
 
         //driver.leftTrigger().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
         //driver.a().onTrue(new InstantCommand(() -> swerve.resetPose(null)));
-        driver.y().whileTrue(new ClimbMoveToPos(climber, 0));
-        driver.x().whileTrue(new ClimbMoveToPos(climber, 125));
-        driver.b().whileTrue(new ClimbMoveToPos(climber, -112.55));
+        driver.y().whileTrue(climber.goTo(ClimberPosition.kHome));
+        driver.x().whileTrue(climber.goTo(ClimberPosition.kIn));
+        driver.b().whileTrue(climber.goTo(ClimberPosition.kOut));
         // driver.y().whileTrue(leds.setc)
 
         driver.leftStick().whileTrue(swerve.turboSpin(this::driverX, this::driverY, this::driverAngular));
@@ -123,19 +124,19 @@ public final class Robot extends TimedRobot {
 
         operator.a().whileTrue(new MoveArmToAngle(arm, ArmConstants.L1_ARM_POS)
             .alongWith(extension.goTo(ExtensionPosition.kLevel1, this::safeForExtension))
-            .alongWith(new ReefLights(leds,true, 1))); //arm l1
+            .alongWith(leds.setReefLights(true, 1))); //arm l1
 
         operator.x().whileTrue(new MoveArmToAngle(arm, ArmConstants.L2_ARM_POS)
             .alongWith(extension.goTo(ExtensionPosition.kLevel2, this::safeForExtension))
-            .alongWith(new ReefLights(leds, true, 2))); //arm l2
+            .alongWith(leds.setReefLights(true, 2))); //arm l2
 
         operator.b().whileTrue(new MoveArmToAngle(arm,  ArmConstants.L3_ARM_POS)
             .alongWith(extension.goTo(ExtensionPosition.kLevel3, this::safeForExtension))
-            .alongWith(new ReefLights(leds, true, 3))); //arm l3
+            .alongWith(leds.setReefLights(true, 3))); //arm l3
 
         operator.y().whileTrue(new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS)
             .alongWith(extension.goTo(ExtensionPosition.kLevel4, this::safeForExtension))
-            .alongWith(new ReefLights(leds,true, 4))); //arm l4
+            .alongWith(leds.setReefLights(true, 4))); //arm l4
 
         operator.rightTrigger(0.1).whileTrue(new AnalogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value), placer,false));
         operator.leftTrigger(0.1).whileTrue(new AnalogPlacer(() -> operator.getRawAxis(XboxController.Axis.kLeftTrigger.value), placer,true));
