@@ -11,17 +11,13 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
 import org.team1126.lib.util.Mutable;
 import org.team1126.lib.util.Tunable;
 import org.team1126.lib.util.Tunable.TunableDouble;
 import org.team1126.lib.util.command.GRRSubsystem;
 import org.team1126.robot.Constants.ClimbConstants;
-import org.team1126.robot.subsystems.ExtensionSubsystem.ExtensionPosition;
 
 public class ClimbSubsystem extends GRRSubsystem {
 
