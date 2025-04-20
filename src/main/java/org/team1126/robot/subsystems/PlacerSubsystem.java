@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -97,6 +98,57 @@ public class PlacerSubsystem extends GRRSubsystem {
         .ignoringDisable(false);
     }
     
+public Command ingestCoral(){
+
+    return commandBuilder("PlacerSubsystem.ingestCoral()").onExecute(() ->
+    placer.set(.2))
+    .isFinished(() -> {
+        if (bottomHasCoral()){
+            return true;
+        }
+        return false;
+        }
+    )
+    .onEnd(() -> placer.set(0));
+}
+
+public Command positionCoral(){
+
+    return commandBuilder("PlacerSubsystem.ingestCoral()").onExecute(() ->
+    placer.set(-.1))
+    .isFinished(() -> {
+        if (!bottomHasCoral()){
+            return true;
+        }
+        return false;
+        }
+    )
+    .onEnd(() -> placer.set(0));
+}
+
+
+public Command analogPlacer(DoubleSupplier power,boolean reverse){
+    return commandBuilder("PlacerSubsystem.analogPlacer").onExecute(()->{
+        double speed;
+         if(reverse){
+            speed =  -MathUtil.applyDeadband(power.getAsDouble(), .02) * .3;
+        }else {
+            speed =  MathUtil.applyDeadband(power.getAsDouble(), .02) * .3;
+        }
+       
+        placer.set(speed);
+    }
+    )
+    .onEnd(() -> placer.set(0));
+}
+
+public Command placeCoral(double speed){
+    return commandBuilder("PlacerSubsystem.placeCoral").onExecute(() -> {
+        placer.set(speed);
+    })
+    .onEnd(() ->placer.set(0));
+}
+
     /**
      * Moves the placer at a set speed.
      * 

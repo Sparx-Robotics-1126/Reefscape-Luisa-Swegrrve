@@ -1,7 +1,7 @@
 package org.team1126.robot;
 
-import static edu.wpi.first.wpilibj.XboxController.Axis.*;
-import static edu.wpi.first.wpilibj2.command.Commands.*;
+// import static edu.wpi.first.wpilibj.XboxController.Axis.*;
+// import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Epilogue;
@@ -13,30 +13,14 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import org.team1126.lib.util.DisableWatchdog;
 import org.team1126.lib.util.Profiler;
 import org.team1126.lib.util.Tunable;
-import org.team1126.robot.Constants.AprilTagPositions;
-import org.team1126.robot.Constants.ArmConstants;
 import org.team1126.robot.commands.Autos;
 import org.team1126.robot.commands.Routines;
 import org.team1126.robot.commands.LED.RainbowCommand;
-import org.team1126.robot.commands.LED.ReefLights;
 import org.team1126.robot.commands.LED.TeamLights;
-import org.team1126.robot.commands.arm.ControllerMoveArm;
-import org.team1126.robot.commands.arm.MoveArmToAngle;
-import org.team1126.robot.commands.arm.MoveExtHome;
-import org.team1126.robot.commands.arm.MoveExtensionToPos;
-import org.team1126.robot.commands.climb.ClimbMoveToPos;
-import org.team1126.robot.commands.placer.AnalogPlacer;
-import org.team1126.robot.commands.placer.IngestCoral;
-import org.team1126.robot.commands.placer.PositionCoral;
 import org.team1126.robot.subsystems.ArmSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem.ClimberPosition;
@@ -121,7 +105,7 @@ public final class Robot extends TimedRobot {
 
         operator.povUp().whileTrue(arm.goTo(ArmPosition.kCoralStation)
             .alongWith(extension.goTo(ExtensionPosition.kCoralStation, this::safeForExtension))   //arm to coral station
-            .alongWith(new IngestCoral(placer, -.8).andThen(new PositionCoral(placer))));                                                  
+            .alongWith(placer.ingestCoral()).andThen(placer.positionCoral()));                                                  
 
         operator.a().whileTrue(arm.goTo(ArmPosition.kLevel1)
             .alongWith(extension.goTo(ExtensionPosition.kLevel1, this::safeForExtension))
@@ -139,8 +123,8 @@ public final class Robot extends TimedRobot {
             .alongWith(extension.goTo(ExtensionPosition.kLevel4, this::safeForExtension))
             .alongWith(leds.setReefLights(true, 4))); //arm l4
 
-        operator.rightTrigger(0.1).whileTrue(new AnalogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value), placer,false));
-        operator.leftTrigger(0.1).whileTrue(new AnalogPlacer(() -> operator.getRawAxis(XboxController.Axis.kLeftTrigger.value), placer,true));
+        operator.rightTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value),false));
+        operator.leftTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kLeftTrigger.value),true));
 
         // Create triggers
         RobotModeTriggers.autonomous().whileTrue(autos.runSelectedAuto());
