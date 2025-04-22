@@ -51,7 +51,7 @@ public class PlacerSubsystem extends GRRSubsystem {
      * a call to the configureSparkMaxes() method, thus it does not need to be
      * called separately.
      * 
-     * TODO: consider pulling the configureSparkMaxes() method into the
+     * TODO: consider pulling the configure SparkMaxes() method into the
      * constructor unless it has the potential of being called multiple times
      */
     public PlacerSubsystem() { 
@@ -101,8 +101,8 @@ public class PlacerSubsystem extends GRRSubsystem {
 public Command ingestCoral(){
 
     return commandBuilder("PlacerSubsystem.ingestCoral()").onExecute(() ->
-    placer.set(.2))
-    .isFinished(() -> {
+    placer.set(.15)) 
+    .isFinished(() -> { System.out.println(bottomHasCoral());
         if (bottomHasCoral()){
             return true;
         }
@@ -113,7 +113,7 @@ public Command ingestCoral(){
 }
 
 public Command positionCoral(){
-
+    System.out.println("HERE");
     return commandBuilder("PlacerSubsystem.ingestCoral()").onExecute(() ->
     placer.set(-.1))
     .isFinished(() -> {
@@ -132,7 +132,7 @@ public Command analogPlacer(DoubleSupplier power,boolean reverse){
         double speed;
          if(reverse){
             speed =  -MathUtil.applyDeadband(power.getAsDouble(), .02) * .3;
-        }else {
+        } else {
             speed =  MathUtil.applyDeadband(power.getAsDouble(), .02) * .3;
         }
        

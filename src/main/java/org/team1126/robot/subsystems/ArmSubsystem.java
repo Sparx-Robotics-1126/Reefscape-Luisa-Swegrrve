@@ -206,8 +206,10 @@ public class ArmSubsystem extends GRRSubsystem {
         return commandBuilder("Arm.goTo()")
             .onInitialize(() -> holdPosition.value = ArmPosition.kHome.position())
             .onExecute(() -> {
-                turnReachGoal(targetAngle);
-            });
+                turnReachGoal(position.get().position()); 
+                // System.out.println("targetAngle " + position.get().position());
+            })
+            .onEnd(() -> moveArm(0));
     }
 
 }

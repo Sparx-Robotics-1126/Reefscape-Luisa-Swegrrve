@@ -27,6 +27,7 @@ import org.team1126.lib.util.Tunable.TunableDouble;
 import org.team1126.lib.util.command.GRRSubsystem;
 import org.team1126.robot.Constants.ArmConstants;
 import org.team1126.robot.Robot;
+import org.team1126.robot.subsystems.ArmSubsystem.ArmPosition;
 
 
 public final class ExtensionSubsystem extends GRRSubsystem {
@@ -206,39 +207,23 @@ public final class ExtensionSubsystem extends GRRSubsystem {
      * @param safe If the elevator is safe to move.
      */
     public Command goTo(ExtensionPosition position, BooleanSupplier safe) {
-        return goTo(() -> position, () -> 0.0, safe);
+        return goTo(() -> position);
     }
-    /**
-     * Goes to a position.
-     * @param position The position to go to.
-     * @param safe If the elevator is safe to move.
-     */
-    private Command goTo(Supplier<ExtensionPosition> position, DoubleSupplier fudge, BooleanSupplier safe) {
-        Mutable<Double> holdPosition = new Mutable<>(ExtensionPosition.kHome.position());
+
+    // /**
+    //  * Goes to a position.
+    //  * @param position The position to go to.
+    //  * @param safe If the elevator is safe to move.
+    //  */
+    private Command goTo(Supplier<ExtensionPosition> position) {
+        Mutable<Double> holdPosition = new Mutable<>(ArmPosition.kHome.position());
 
         return commandBuilder("Extension.goTo()")
             .onInitialize(() -> holdPosition.value = ExtensionPosition.kHome.position())
             .onExecute(() -> {
-                double target = position.get().position();
-                double currentPosition = getExtension();
-
-                if (!safe.getAsBoolean()) {
-                    if (holdPosition.value < 0.0) {
-                        ExtensionPosition close = ExtensionPosition.closeTo(currentPosition);
-                        holdPosition.value = close != null ? close.position() : currentPosition;
-                    }
-
-                    target = holdPosition.value;
-                } else {
-                    holdPosition.value = ExtensionPosition.kHome.position();
-                }
-
-                
-                if (currentPosition - kZeroTolerance.value() <= 0.0 && target - kZeroTolerance.value() <= 0.0) {
-                    this.stopExtension();
-                } else {
-                    this.extReachGoal(targetExtension);
-                }
-            });
+                extReachGoal(position.get().position()); 
+                // System.out.println("targetAngle " + position.get().position());
+            })
+            .onEnd(() -> moveExtension(0));
     }
 }

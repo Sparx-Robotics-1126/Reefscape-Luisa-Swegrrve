@@ -81,7 +81,7 @@ public final class Robot extends TimedRobot {
         swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));
         leds.setDefaultCommand(leds.setReefLights(false, 1126));
         // arm.setDefaultCommand(new ControllerMoveArm(()-> operator.getRawAxis(XboxController.Axis.kLeftY.value), arm));
-       extension.setDefaultCommand(extension.setExtGoal( .03));
+       extension.setDefaultCommand(extension.goTo(ExtensionPosition.kHome, this::safeForExtension));
 
        routines = new Routines(this);
         autos = new Autos(this);
@@ -207,6 +207,8 @@ public final class Robot extends TimedRobot {
     }
 
     public boolean safeForExtension() {
+        //System.out.println(arm.getArmAngle() > 7.5);
         return arm.getArmAngle() > 7.5;
+
     }
 }

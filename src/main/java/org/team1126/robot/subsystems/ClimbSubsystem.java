@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.team1126.lib.util.Mutable;
 import org.team1126.lib.util.Tunable;
@@ -160,22 +159,22 @@ public class ClimbSubsystem extends GRRSubsystem {
      * @param safe If the climber is safe to move.
      */
     public Command goTo(ClimberPosition position) {
-        return goTo(() -> position, () -> 0.0);
+        return goTo(() -> position);
     }
     /**
      * Goes to a position.
      * @param position The position to go to.
      * @param safe If the climber is safe to move.
      */
-    private Command goTo(Supplier<ClimberPosition> position, DoubleSupplier fudge) {
+    private Command goTo(Supplier<ClimberPosition> position) {
         Mutable<Double> holdPosition = new Mutable<>(ClimberPosition.kHome.position());
 
         return commandBuilder("Climber.goTo()")
             .onInitialize(() -> holdPosition.value = ClimberPosition.kHome.position())
             .onExecute(() -> {
                
-            this.climbReachGoal(position.get().position());
-            this.setBeachMode(false);
+                this.climbReachGoal(position.get().position());
+                this.setBeachMode(false);
             })
             .onEnd( ()->   moveClimb(0));
     }

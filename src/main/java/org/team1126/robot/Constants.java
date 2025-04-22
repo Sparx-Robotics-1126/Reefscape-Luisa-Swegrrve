@@ -87,6 +87,13 @@ public static final class PlacerConstants {
     public static final int PLACER_TOP_ID = 12;
 }
 
+public static final class AlgaeConstants {
+  public static final int ALGAE_WHEELS_ID = 21;
+  public static final int ALGAE_ROTATION_ID = 22;
+  public static final int ALGAE_HOME_ID =16 ; // change these
+  public static final int ALGAE_SENSOR_ID = 11; // and these
+}
+
 public static final class ClimbConstants {
     public static final int CLIMB_ID = 41;
 }
