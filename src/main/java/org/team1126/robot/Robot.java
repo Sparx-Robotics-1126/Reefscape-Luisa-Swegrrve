@@ -79,9 +79,9 @@ public final class Robot extends TimedRobot {
         operator = new CommandXboxController(Constants.kOperator);
         
         swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));
-        leds.setDefaultCommand(leds.setReefLights(false, 1126));
+        leds.setDefaultCommand(leds.setAllianceColorCommand());
         // arm.setDefaultCommand(new ControllerMoveArm(()-> operator.getRawAxis(XboxController.Axis.kLeftY.value), arm));
-       extension.setDefaultCommand(extension.goTo(ExtensionPosition.kHome, this::safeForExtension));
+        extension.setDefaultCommand(extension.goTo(ExtensionPosition.kHome, this::safeForExtension));
 
        routines = new Routines(this);
         autos = new Autos(this);
@@ -105,23 +105,23 @@ public final class Robot extends TimedRobot {
 
         operator.povUp().whileTrue(arm.goTo(ArmPosition.kCoralStation)
             .alongWith(extension.goTo(ExtensionPosition.kCoralStation, this::safeForExtension))   //arm to coral station
-            .alongWith(placer.ingestCoral()).andThen(placer.positionCoral()));                                                  
+            .alongWith(placer.ingestCoral().andThen(placer.positionCoral()).alongWith(leds.setReefLights(5))));                                                  
 
         operator.a().whileTrue(arm.goTo(ArmPosition.kLevel1)
             .alongWith(extension.goTo(ExtensionPosition.kLevel1, this::safeForExtension))
-            .alongWith(leds.setReefLights(true, 1))); //arm l1
+            .alongWith(leds.setReefLights(1))); //arm l1
 
         operator.x().whileTrue(arm.goTo(ArmPosition.kLevel2)
             .alongWith(extension.goTo(ExtensionPosition.kLevel2, this::safeForExtension))
-            .alongWith(leds.setReefLights(true, 2))); //arm l2
+            .alongWith(leds.setReefLights(2))); //arm l2
 
         operator.b().whileTrue(arm.goTo(ArmPosition.kLevel3)
             .alongWith(extension.goTo(ExtensionPosition.kLevel3, this::safeForExtension))
-            .alongWith(leds.setReefLights(true, 3))); //arm l3
+            .alongWith(leds.setReefLights(3))); //arm l3
 
         operator.y().whileTrue(arm.goTo(ArmPosition.kLevel4)
             .alongWith(extension.goTo(ExtensionPosition.kLevel4, this::safeForExtension))
-            .alongWith(leds.setReefLights(true, 4))); //arm l4
+            .alongWith(leds.setReefLights(4))); //arm l4
 
         operator.rightTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value),false));
         operator.leftTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kLeftTrigger.value),true));
@@ -179,8 +179,8 @@ public final class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        var lights = new TeamLights(leds);
-        lights.initialize();
+        // var lights = new TeamLights(leds);
+        // lights.initialize();
     }
 
     @Override
@@ -207,7 +207,6 @@ public final class Robot extends TimedRobot {
     }
 
     public boolean safeForExtension() {
-        //System.out.println(arm.getArmAngle() > 7.5);
         return arm.getArmAngle() > 7.5;
 
     }

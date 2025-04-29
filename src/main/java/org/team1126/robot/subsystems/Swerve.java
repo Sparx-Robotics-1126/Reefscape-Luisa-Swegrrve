@@ -129,6 +129,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
     private final SwerveState state;
     private final VisionManager vision;
 
+    
 
     private final PIDController autoPIDx;
     private final PIDController autoPIDy;
@@ -159,7 +160,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
 
         autoPIDx = new PIDController(15.0, 0.0, 0.0);
         autoPIDy = new PIDController(15.0, 0.0, 0.0);
-        autoPIDangular = new PIDController(10.0, 0.0, 0.0);
+        autoPIDangular = new PIDController(14.8, 0.0, 0.0);
         autoPIDangular.enableContinuousInput(-Math.PI, Math.PI);
 
         angularPID = new ProfiledPIDController(10.0, 0.5, 0.25, new Constraints(10.0, 30.0));

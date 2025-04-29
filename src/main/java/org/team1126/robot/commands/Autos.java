@@ -67,6 +67,7 @@ public final class Autos {
         chooser.addRoutine("2 Note RIGHT", () -> anotherMoveTestAutoRoutine(false));
         chooser.addRoutine("2 Note LEFT", () -> anotherMoveTestAutoRoutine(true));
         chooser.addRoutine("Move Straight", () -> L4Test(false));
+        chooser.addRoutine("TEST AUTO", () -> TestLine(false));
         // chooser.addRoutine("Right L x3 (Hopper)", () -> Lx3Hopper(true));
         // chooser.addRoutine("Left L x3 (Baby Bird)", () -> Lx3BabyBird(false));
         // chooser.addRoutine("Right L x3 (Baby Bird)", () -> Lx3BabyBird(true));
@@ -280,5 +281,24 @@ private AutoRoutine L4Test(boolean mirror) {
     return routine;
 
 }
-     
+
+public AutoRoutine TestLine(boolean mirror) {
+    AutoRoutine routine = factory.newRoutine("TestPath");
+
+    AutoTrajectory straightPath = routine.trajectory("TestPath", mirror);
+
+    routine
+    .active()
+    .onTrue(
+        sequence(
+            parallel(
+                swerve.resetAutoPID()
+            ),
+            straightPath.spawnCmd()
+
+        )
+    );
+
+    return routine;
+} 
 }

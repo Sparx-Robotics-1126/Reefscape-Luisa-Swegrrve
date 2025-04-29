@@ -1,5 +1,7 @@
 package org.team1126.robot.subsystems;
 
+import org.team1126.lib.util.Tunable;
+import org.team1126.lib.util.Tunable.TunableDouble;
 import org.team1126.lib.util.command.CommandBuilder;
 import org.team1126.lib.util.command.GRRSubsystem;
 
@@ -15,6 +17,7 @@ public class LEDs extends GRRSubsystem {
     private final AddressableLED led;
     private final AddressableLEDBuffer ledBuffer;
     private int chaseIndex = 0;
+    private final TunableDouble pulse = Tunable.doubleValue("LEDs_pulse_rate", 500);
 
     public LEDs(int port, int ledCount) {
         led = new AddressableLED(port);
@@ -95,59 +98,61 @@ public AddressableLEDBuffer getLedBuffer() {
     public void periodic() {
         // This method will be called once per scheduler run
     }
+    public void setAllianceColor() {
+
+            if (DriverStation.getAlliance().get() == Alliance.Blue ) {
+                setGradient(new Color8Bit(0, 0, 255), new Color8Bit(0, 200, 255));
+            } else {
+                setGradient(new Color8Bit(255, 0, 0), new Color8Bit(255, 0, 5));
+            }
+            update();
+        };
 
     public Command setAllianceColorCommand() {
-        return run(() -> {
-            if (DriverStation.getAlliance().get() == Alliance.Blue ) {
-                setGradient(new Color8Bit(0, 0, 255), new Color8Bit(0, 255, 0));
-            } else {
-                setGradient(new Color8Bit(255, 0, 0), new Color8Bit(255, 255, 0));
-            }
+
+        return commandBuilder("LEDs.setAllianceColorCommand")
+        .onExecute(() -> {
+            setAllianceColor();
         });
+        // });
     }
 
-    public Command setReefLights(boolean isRight, int reefHeight){
+    public Command setReefLights(int reefHeight){
         int start = 0;
         int end = this.getLedBuffer().getLength();
 
         return commandBuilder("LEDs.setReefLights()")
-            .onInitialize(() -> {
-                if(isRight){
+            .onExecute(() -> {
+                
                     if(reefHeight == 1){
+                        // System.out.println("HERE AT 1");
                         for (int i = start; i < end; i++) {
-                            setColor(i,255, 141, 0);
+                            setPulse(new Color8Bit(255, 141, 0),10000, i, end);
                         }
                     } else if(reefHeight == 2){
+                        //System.out.println("HERE AT 2");
                         for (int i = start; i < end; i++) {
-                            setColor(i,186, 255, 0);
+                            //setColor(i,186, 255, 0);
+                            setPulse(new Color8Bit(186, 255, 0),10000, i, end);
                         }
                     } else if (reefHeight == 3){
+                        //System.out.println("HERE AT 3");
                         for (int i = start; i < end; i++) {
-                            setColor(i, 0, 255, 240);
+                            //setColor(i, 0, 255, 240);
+                            setPulse(new Color8Bit(0, 255, 240),10000, i, end);
                         }
                     } else if (reefHeight == 4){
+                        //System.out.println("HERE AT 4");
                         for (int i = start; i < end; i++) {
-                            setColor(i, 148, 0, 255);
+                            //setColor(i, 148, 0, 255);
+                            setPulse(new Color8Bit( 148, 0, 255),10000, i, end);
                         }
                     } else if (reefHeight == 5) {
                             setRainbow();
                         
                     }
-                } else {
-                    if (!DriverStation.getAlliance().isPresent()) {
-                        return;
-                    }
-                    if(DriverStation.getAlliance().get() == Alliance.Blue) {
-                        for(int i = 0; i < getLedBuffer().getLength(); i++)  {
-                            setColor(i, 0, 0, 255);
-                        }
-                    } else {
-                        for(int i = 0; i < getLedBuffer().getLength(); i++) {
-                            setColor(i, 255, 0, 0);
-                        }
-                    }
-                }
-            });
+                update();
+            }).onEnd(() -> setAllianceColor());
         }
 
 

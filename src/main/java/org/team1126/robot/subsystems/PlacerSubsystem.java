@@ -43,7 +43,7 @@ public class PlacerSubsystem extends GRRSubsystem {
     private CANrangeConfigurator bottomSensorConfig;
     private Trigger hasGamepiece;
 
-    private final Debouncer debouncer = new Debouncer(0.14, DebounceType.kRising);
+    private final Debouncer debouncer = new Debouncer(0.12, DebounceType.kRising);
 
 
     /**
@@ -102,18 +102,17 @@ public Command ingestCoral(){
 
     return commandBuilder("PlacerSubsystem.ingestCoral()").onExecute(() ->
     placer.set(.15)) 
-    .isFinished(() -> { System.out.println(bottomHasCoral());
+    .isFinished(() -> {
         if (bottomHasCoral()){
             return true;
         }
-        return false;
+            return false;
         }
     )
     .onEnd(() -> placer.set(0));
 }
 
 public Command positionCoral(){
-    System.out.println("HERE");
     return commandBuilder("PlacerSubsystem.ingestCoral()").onExecute(() ->
     placer.set(-.1))
     .isFinished(() -> {
