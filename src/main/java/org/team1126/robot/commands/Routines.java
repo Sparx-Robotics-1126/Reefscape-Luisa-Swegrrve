@@ -58,10 +58,10 @@ public final class Routines {
         placer = robot.placer;
     }
 
-    public Command driveToCoral(boolean isRight) {
+    public Command driveToCoral(boolean isLeft) {
 
         return parallel(
-            swerve.driveReef(robot::driverX, robot::driverY, robot::driverAngular, selection::isLeft).withTimeout(4)
+            swerve.driveReef(robot::driverX, robot::driverY, robot::driverAngular, ()->isLeft)
         );
     }
 

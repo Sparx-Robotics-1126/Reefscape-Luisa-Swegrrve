@@ -90,7 +90,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         // .setMoveFF(0.05, 0.128)         //      |
         // .setTurnPID(0.05, 0.0, 0.2)  //      V
         .setBrakeMode(true, true)  // Think about turning move to false for testing?
-        .setLimits(4.0, 0.05, 15.5, 10.0, 30.0) 
+        .setLimits(4.0, 0.05, 5, 10.0, 30.0) 
 
                     // Velocity: the max speed the MOTORS are able to go. please don't change this.
                     // VelDeadband: how much deadband is needed on the controller to start moving. 
@@ -129,7 +129,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
     private final SwerveState state;
     private final VisionManager vision;
 
-    
+
 
     private final PIDController autoPIDx;
     private final PIDController autoPIDy;
@@ -158,8 +158,8 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         reefPIDx = new PIDController(6.0, 0.0, 0.40);
         reefPIDy = new PIDController(6.0, 0.0, 0.40);
 
-        autoPIDx = new PIDController(15.0, 0.0, 0.0);
-        autoPIDy = new PIDController(15.0, 0.0, 0.0);
+        autoPIDx = new PIDController(3.3, 0.0, 0.0);
+        autoPIDy = new PIDController(3.3, 0.0, 0.0);
         autoPIDangular = new PIDController(14.8, 0.0, 0.0);
         autoPIDangular.enableContinuousInput(-Math.PI, Math.PI);
 

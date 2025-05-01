@@ -68,6 +68,7 @@ public final class Autos {
         chooser.addRoutine("2 Note LEFT", () -> anotherMoveTestAutoRoutine(true));
         chooser.addRoutine("Move Straight", () -> L4Test(false));
         chooser.addRoutine("TEST AUTO", () -> TestLine(false));
+        chooser.addRoutine("FULL MOVE", () -> wholeMove(false));
         // chooser.addRoutine("Right L x3 (Hopper)", () -> Lx3Hopper(true));
         // chooser.addRoutine("Left L x3 (Baby Bird)", () -> Lx3BabyBird(false));
         // chooser.addRoutine("Right L x3 (Baby Bird)", () -> Lx3BabyBird(true));
@@ -150,12 +151,11 @@ private AutoRoutine anotherMoveTestAutoRoutine(boolean mirror){
     .onTrue(
         Commands.sequence(
             parallel(
-                sequence(
-                    routines.driveToCoral(false).withTimeout(1),
-                    routines.driveToCoral(false).withTimeout(1.5)
-                    ),
-                    routines.toL4(arm, extension).withTimeout(2)
-                ),
+
+                    routines.driveToCoral(true),
+                    // routines.driveToCoral(true)
+                    routines.toL4(arm, extension)
+                ).withTimeout(1),
                 
                 Commands.sequence(routines.placeL4(arm, extension, placer)).withTimeout(1),
                 Commands.parallel(part2.spawnCmd()) //might need to work on timing for arm
@@ -184,13 +184,64 @@ private AutoRoutine anotherMoveTestAutoRoutine(boolean mirror){
     .onTrue(
         Commands.sequence(
             parallel(
-                routines.driveToCoral(false).withTimeout(1.5),
-                routines.toL4(arm, extension).withTimeout(1.5)
-                ),
+
+                    routines.driveToCoral(true),
+                    routines.toL4(arm, extension)
+                ).withTimeout(1.5),
                 
-                Commands.sequence(routines.placeL4(arm, extension, placer)).withTimeout(2),
+                Commands.sequence(routines.placeL4(arm, extension, placer)).withTimeout(1),
                 Commands.parallel(part4.spawnCmd())
-    ));
+        )
+    );
+
+    part4.atTime(.5).onTrue(routines.toCoral(arm, extension));
+
+    return routine;
+}
+
+private AutoRoutine wholeMove(boolean mirror){
+    //System.out.println("Creating Move Test Auto Routine");
+    AutoRoutine routine = factory.newRoutine("Right L4 (1)");
+
+    AutoTrajectory part1 = routine.trajectory("Right L4 (1)", mirror);
+    //might need a small backup command to move away from reef
+    AutoTrajectory part2 = routine.trajectory("Right L4 (2)", mirror);
+    AutoTrajectory part3 = routine.trajectory("Right L4 (3)", mirror);
+    AutoTrajectory part4 = routine.trajectory("Right L4 (4)", mirror);
+
+    routine
+    .active()
+    .onTrue(
+        sequence(
+            parallel(
+                part1.resetOdometry(),
+                swerve.resetAutoPID()
+                
+            ),
+            part1.spawnCmd(),
+            Commands.print("move to right L started")
+        )
+
+    );
+
+    part1.done()
+    .onTrue(
+                Commands.parallel(part2.spawnCmd()) //might need to work on timing for arm
+    );
+
+    part2.active().onTrue(sequence(Commands.waitSeconds(1),routines.toCoral(arm, extension).withTimeout(2)));
+    part2.done()
+        .onTrue(Commands.sequence(
+                    part3.spawnCmd()
+
+            )
+        );
+
+    part3.done()
+    .onTrue(
+
+                Commands.parallel(part4.spawnCmd())
+    );
 
     part4.atTime(.5).onTrue(routines.toCoral(arm, extension));
 
@@ -285,7 +336,7 @@ private AutoRoutine L4Test(boolean mirror) {
 public AutoRoutine TestLine(boolean mirror) {
     AutoRoutine routine = factory.newRoutine("TestPath");
 
-    AutoTrajectory straightPath = routine.trajectory("TestPath", mirror);
+    AutoTrajectory straightPath = routine.trajectory("Right L4 (1)", mirror);
 
     routine
     .active()
@@ -298,6 +349,8 @@ public AutoRoutine TestLine(boolean mirror) {
 
         )
     );
+    
+    straightPath.done().onTrue(routines.driveToCoral(mirror).withTimeout(2));
 
     return routine;
 } 
