@@ -43,7 +43,7 @@ public class PlacerSubsystem extends GRRSubsystem {
     private CANrangeConfigurator bottomSensorConfig;
     private Trigger hasGamepiece;
 
-    private final Debouncer debouncer = new Debouncer(0.12, DebounceType.kRising);
+    private final Debouncer debouncer = new Debouncer(0.14, DebounceType.kRising);
 
 
     /**

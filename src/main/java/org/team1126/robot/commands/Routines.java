@@ -22,7 +22,9 @@ import org.team1126.robot.commands.arm.MoveExtensionToPos;
 // import org.team1126.robot.commands.placer.PlaceCoral;
 // import org.team1126.robot.commands.placer.PositionCoral;
 import org.team1126.robot.subsystems.ArmSubsystem;
+import org.team1126.robot.subsystems.ArmSubsystem.ArmPosition;
 import org.team1126.robot.subsystems.ExtensionSubsystem;
+import org.team1126.robot.subsystems.ExtensionSubsystem.ExtensionPosition;
 // import org.team1126.robot.subsystems.Climber;
 // import org.team1126.robot.subsystems.ExtensionSubsystem;
 // import org.team1126.robot.subsystems.Elevator.ElevatorPosition;
@@ -73,47 +75,73 @@ public Command safe(BooleanSupplier button){
 
     public Command toL4(ArmSubsystem arm, ExtensionSubsystem extension) {
 
-        return parallel(
-            new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS),
-            new MoveExtensionToPos(extension, arm, ExtensionConstants.L4_EXT_POS)
-        );
+        return parallel(arm.goTo(ArmPosition.kLevel4)
+            .alongWith(extension.goTo(ExtensionPosition.kLevel4, robot::safeForExtension)));
+
+        // return parallel(
+        //     new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS),
+        //     new MoveExtensionToPos(extension, arm, ExtensionConstants.L4_EXT_POS)
+        // );
     }
 
     public Command placeL4(ArmSubsystem arm, ExtensionSubsystem extension, PlacerSubsystem placer) {
 
-        return 
-            parallel(
-                new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS),
-                new MoveExtensionToPos(extension, arm, ExtensionConstants.L4_EXT_POS),
-                sequence (
+        return parallel(
+                arm.goTo(ArmPosition.kLevel4),
+                extension.goTo(ExtensionPosition.kLevel4, robot::safeForExtension),
+                sequence( 
                     waitUntil(swerve::inRange),
-                    placer.placeCoral( .3).withTimeout(1)
-                )
-                
+                    placer.placeCoral( .3).withTimeout(1))
             );
+        // return 
+        //     parallel(
+        //         new MoveArmToAngle(arm, ArmConstants.L4_ARM_POS),
+        //         new MoveExtensionToPos(extension, arm, ExtensionConstants.L4_EXT_POS),
+        //         sequence (
+        //             waitUntil(swerve::inRange),
+        //             placer.placeCoral( .3).withTimeout(1)
+        //         )
+                
+        //     );
     }
 
     public Command moveHome(ArmSubsystem arm, ExtensionSubsystem extension){
 
-        return parallel(
-            new MoveArmToAngle(arm, -.01),
-            new MoveExtHome(extension, 0)
-        );
+        return parallel(arm.goTo(ArmPosition.kHome)
+        .alongWith(extension.goTo(ExtensionPosition.kHome,  ()-> true) ));
+        // return parallel(
+        //     new MoveArmToAngle(arm, -.01),
+        //     new MoveExtHome(extension, 0)
+        // );
     }
 
     public Command toCoral(ArmSubsystem arm, ExtensionSubsystem extension) {
+        return parallel( arm.goTo(ArmPosition.kCoralStation)
+        .alongWith(extension.goTo(ExtensionPosition.kCoralStation, robot::safeForExtension)));
 
-        return parallel(
-            new MoveArmToAngle(arm, 18.442849922180176),
-            new MoveExtensionToPos(extension, arm, .01)
-        );
+
+        // return parallel(
+        //     new MoveArmToAngle(arm, 18.442849922180176),
+        //     new MoveExtensionToPos(extension, arm, .01)
+        // );
     }
     public Command intakeCoral(PlacerSubsystem placer) {
-        return sequence(
-            placer.ingestCoral(),
-            placer.positionCoral()
+        return sequence(   
+            placer.ingestCoral()
+            
         );
     }
+    public Command positionCoral(PlacerSubsystem placer) {
+        return sequence(
+            placer.positionCoral()
+            
+        );
+    }
+        
+        // return sequence(
+        //     placer.ingestCoral(),
+        //     placer.positionCoral()
+        // );
 
 
     

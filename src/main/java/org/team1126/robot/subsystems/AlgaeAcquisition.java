@@ -167,6 +167,13 @@ public class AlgaeAcquisition extends GRRSubsystem {
         }
         return !algaeSensor.get();
     }
+
+    public Command spitAlgae(double speed) {
+        return commandBuilder()
+        .onExecute(() -> {
+            spinAlgaeWheels(speed);})
+            .onEnd(() -> spinAlgaeWheels(0));
+    }
          /**
      * Goes to a position.
      * @param position The position to go to.

@@ -21,6 +21,7 @@ import org.team1126.robot.commands.Autos;
 import org.team1126.robot.commands.Routines;
 import org.team1126.robot.commands.LED.RainbowCommand;
 import org.team1126.robot.commands.LED.TeamLights;
+import org.team1126.robot.subsystems.AlgaeAcquisition;
 import org.team1126.robot.subsystems.ArmSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem.ClimberPosition;
@@ -28,6 +29,7 @@ import org.team1126.robot.subsystems.ExtensionSubsystem;
 import org.team1126.robot.subsystems.LEDs;
 import org.team1126.robot.subsystems.PlacerSubsystem;
 import org.team1126.robot.subsystems.Swerve;
+import org.team1126.robot.subsystems.AlgaeAcquisition.AlgaePosition;
 import org.team1126.robot.subsystems.ArmSubsystem.ArmPosition;
 import org.team1126.robot.subsystems.ExtensionSubsystem.ExtensionPosition;
 import org.team1126.robot.util.ReefSelection;
@@ -43,6 +45,7 @@ public final class Robot extends TimedRobot {
     public final ExtensionSubsystem extension;
     public final ArmSubsystem arm;
     public final PlacerSubsystem placer;
+    public final AlgaeAcquisition algae;
     public final Autos autos;
     public final LEDs leds;
     public final ReefSelection selection;
@@ -69,6 +72,7 @@ public final class Robot extends TimedRobot {
         extension = new ExtensionSubsystem(this);
         arm = new ArmSubsystem(this);
         placer = new PlacerSubsystem();
+        algae = new AlgaeAcquisition();
         swerve = new Swerve();
         leds = new LEDs(0, 300); // PORT IS PWM!!
 
@@ -126,6 +130,15 @@ public final class Robot extends TimedRobot {
         operator.rightTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value),false));
         operator.leftTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kLeftTrigger.value),true));
 
+        operator.povRight().whileTrue(algae.goTo(AlgaePosition.kOut));
+        operator.leftBumper().whileTrue(algae.goTo(AlgaePosition.kHome));
+        operator.rightBumper().whileTrue(algae.spitAlgae(.05));
+
+
+                // m_operator.povRight().whileTrue(new AlgaeMoveToPosition(m_algae, 40));
+        // m_operator.leftBumper().whileTrue(new AlgaeMoveToHome(m_algae));
+        // m_operator.rightBumper().whileTrue(new SpitAlgae(m_algae));
+
         // Create triggers
         RobotModeTriggers.autonomous().whileTrue(autos.runSelectedAuto());
         RobotModeTriggers.autonomous().whileTrue(new RainbowCommand(leds));
@@ -179,8 +192,7 @@ public final class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        // var lights = new TeamLights(leds);
-        // lights.initialize();
+        leds.setReefLights(1126).initialize();
     }
 
     @Override
