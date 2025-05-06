@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import org.team1126.lib.util.Profiler;
@@ -108,8 +109,9 @@ public final class Robot extends TimedRobot {
             .alongWith(extension.goTo(ExtensionPosition.kHome,  ()-> true) )); //arm home
 
         operator.povUp().whileTrue(arm.goTo(ArmPosition.kCoralStation)
-            .alongWith(extension.goTo(ExtensionPosition.kCoralStation, this::safeForExtension))   //arm to coral station
-            .alongWith(placer.ingestCoral().andThen(placer.positionCoral()).alongWith(leds.setReefLights(5))));                                                  
+            .alongWith(extension.goTo(ExtensionPosition.kCoralStation, this::safeForExtension)).andThen(new WaitCommand(2))   //arm to coral station
+            .alongWith(placer.ingestCoral().andThen(placer.positionCoral()).alongWith(leds.setReefLights(5))));          
+        // operator.povUp().whileTrue(arm.goTo(ArmPosition.kCoralStation).alongWith(extension.goTo(ExtensionPosition.kCoralStation, this::safeForExtension)).withTimeout(1).andThen(placer.ingestCoral().andThen(placer.positionCoral()).alongWith(leds.setReefLights(5)))); //arm to coral station                                    
 
         operator.a().whileTrue(arm.goTo(ArmPosition.kLevel1)
             .alongWith(extension.goTo(ExtensionPosition.kLevel1, this::safeForExtension))
@@ -132,7 +134,7 @@ public final class Robot extends TimedRobot {
 
         operator.povRight().whileTrue(algae.goTo(AlgaePosition.kOut));
         operator.leftBumper().whileTrue(algae.goTo(AlgaePosition.kHome));
-        operator.rightBumper().whileTrue(algae.spitAlgae(.05));
+        operator.rightBumper().whileTrue(algae.spitAlgae(.5));
 
 
                 // m_operator.povRight().whileTrue(new AlgaeMoveToPosition(m_algae, 40));
@@ -192,7 +194,7 @@ public final class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        leds.setReefLights(1126).initialize();
+        leds.setAllianceColor();
     }
 
     @Override

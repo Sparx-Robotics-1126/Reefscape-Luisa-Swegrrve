@@ -35,7 +35,7 @@ public class AlgaeAcquisition extends GRRSubsystem {
 
     public static enum AlgaePosition {
         kHome(0),
-        kOut(40);
+        kOut(30);
         
 
         private final TunableDouble position;
@@ -169,6 +169,13 @@ public class AlgaeAcquisition extends GRRSubsystem {
     }
 
     public Command spitAlgae(double speed) {
+        return commandBuilder()
+        .onExecute(() -> {
+            spinAlgaeWheels(speed);})
+            .onEnd(() -> spinAlgaeWheels(0));
+    }
+
+    public Command spinAlgae(double speed){
         return commandBuilder()
         .onExecute(() -> {
             spinAlgaeWheels(speed);})
