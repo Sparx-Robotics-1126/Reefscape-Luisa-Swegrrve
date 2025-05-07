@@ -190,6 +190,19 @@ public class AlgaeAcquisition extends GRRSubsystem {
         return goTo(() -> position);
     }
 
+    public Command acqAlgae(AlgaePosition position, double speed) {
+        return commandBuilder("Algae.acquire()")
+            .onExecute(() -> {
+                spinAlgaeWheels(speed);
+                this.reachGoal(position.position());
+                // goTo(() -> position);
+            })
+            .onEnd(() -> {
+                if (hasAlgae()) {
+                    spinAlgaeWheels(0);
+                } 
+        });
+    }
     /**
      * Goes to a position.
      * @param position The position to go to.

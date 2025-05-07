@@ -21,7 +21,6 @@ import org.team1126.lib.util.Tunable;
 import org.team1126.robot.commands.Autos;
 import org.team1126.robot.commands.Routines;
 import org.team1126.robot.commands.LED.RainbowCommand;
-import org.team1126.robot.commands.LED.TeamLights;
 import org.team1126.robot.subsystems.AlgaeAcquisition;
 import org.team1126.robot.subsystems.ArmSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem;
@@ -52,6 +51,9 @@ public final class Robot extends TimedRobot {
     public final ReefSelection selection;
     public final Routines routines;
 
+    private final boolean isDemoMode = true;
+    private  double speedFactor = 1;
+    private  double rotationFactor = 1;
 
     private final CommandXboxController driver;
     private final CommandXboxController operator;
@@ -61,6 +63,11 @@ public final class Robot extends TimedRobot {
         DriverStation.silenceJoystickConnectionWarning(true);
         // DisableWatchdog.in(scheduler, "m_watchdog");
         // DisableWatchdog.in(this, "m_watchdog");
+
+        if (isDemoMode){
+            speedFactor = .5;
+            rotationFactor = .75;
+        }
 
         // Configure logging
         DataLogManager.start();
@@ -94,9 +101,11 @@ public final class Robot extends TimedRobot {
 
         //driver.leftTrigger().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
         //driver.a().onTrue(new InstantCommand(() -> swerve.resetPose(null)));
-        driver.y().whileTrue(climber.goTo(ClimberPosition.kHome));
-        driver.x().whileTrue(climber.goTo(ClimberPosition.kIn));
-        driver.b().whileTrue(climber.goTo(ClimberPosition.kOut));
+        if(!isDemoMode){
+            driver.y().whileTrue(climber.goTo(ClimberPosition.kHome));
+            driver.x().whileTrue(climber.goTo(ClimberPosition.kIn));
+            driver.b().whileTrue(climber.goTo(ClimberPosition.kOut));
+        }
         // driver.y().whileTrue(leds.setc)
 
         driver.leftStick().whileTrue(swerve.turboSpin(this::driverX, this::driverY, this::driverAngular));
@@ -132,9 +141,9 @@ public final class Robot extends TimedRobot {
         operator.rightTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value),false));
         operator.leftTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kLeftTrigger.value),true));
 
-        operator.povRight().whileTrue(algae.goTo(AlgaePosition.kOut));
+        operator.povRight().whileTrue(algae.acqAlgae(AlgaePosition.kOut,4));
         operator.leftBumper().whileTrue(algae.goTo(AlgaePosition.kHome));
-        operator.rightBumper().whileTrue(algae.spitAlgae(.5));
+        operator.rightBumper().whileTrue(algae.spitAlgae(-.5));
 
 
                 // m_operator.povRight().whileTrue(new AlgaeMoveToPosition(m_algae, 40));
@@ -166,17 +175,17 @@ public final class Robot extends TimedRobot {
    
     @NotLogged
     public double driverX() {
-        return driver.getLeftX();
+        return driver.getLeftX() * speedFactor;
     }
 
     @NotLogged
     public double driverY() {
-        return driver.getLeftY();
+        return driver.getLeftY() * speedFactor;
     }
 
     @NotLogged
     public double driverAngular() {
-        return -driver.getRightX();
+        return -driver.getRightX() * rotationFactor;
     }
 
     @Override
