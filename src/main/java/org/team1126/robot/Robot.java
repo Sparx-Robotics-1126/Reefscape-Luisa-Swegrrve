@@ -51,7 +51,8 @@ public final class Robot extends TimedRobot {
     public final ReefSelection selection;
     public final Routines routines;
 
-    private final boolean isDemoMode = true;
+    private final boolean isDemoMode = false;
+
     private  double speedFactor = 1;
     private  double rotationFactor = 1;
 
@@ -119,7 +120,7 @@ public final class Robot extends TimedRobot {
 
         operator.povUp().whileTrue(arm.goTo(ArmPosition.kCoralStation)
             .alongWith(extension.goTo(ExtensionPosition.kCoralStation, this::safeForExtension)).andThen(new WaitCommand(2))   //arm to coral station
-            .alongWith(placer.ingestCoral().andThen(placer.positionCoral()).alongWith(leds.setReefLights(5))));          
+            .alongWith(placer.ingestCoral(this::safeForPlacer).andThen(placer.positionCoral()).alongWith(leds.setReefLights(5))));          
         // operator.povUp().whileTrue(arm.goTo(ArmPosition.kCoralStation).alongWith(extension.goTo(ExtensionPosition.kCoralStation, this::safeForExtension)).withTimeout(1).andThen(placer.ingestCoral().andThen(placer.positionCoral()).alongWith(leds.setReefLights(5)))); //arm to coral station                                    
 
         operator.a().whileTrue(arm.goTo(ArmPosition.kLevel1)
@@ -231,6 +232,10 @@ public final class Robot extends TimedRobot {
 
     public boolean safeForExtension() {
         return arm.getArmAngle() > 7.5;
+    }
 
+    
+    public boolean safeForPlacer() {
+        return arm.getArmAngle() > (ArmPosition.kCoralStation.position()-3);
     }
 }

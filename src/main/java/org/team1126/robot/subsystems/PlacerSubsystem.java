@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.team1126.lib.util.command.GRRSubsystem;
@@ -44,7 +45,7 @@ public class PlacerSubsystem extends GRRSubsystem {
     private CANrangeConfigurator bottomSensorConfig;
     private Trigger hasGamepiece;
 
-    private final Debouncer debouncer = new Debouncer(0.14, DebounceType.kRising);
+    private final Debouncer debouncer = new Debouncer(0.2, DebounceType.kRising);
 
 
     /**
@@ -114,6 +115,28 @@ public Command ingestCoral(){
     )
     .onEnd(() -> placer.set(0));
 }
+
+public Command ingestCoral(BooleanSupplier safeForPlacer){
+
+    return commandBuilder("PlacerSubsystem.ingestCoral()")
+    .onExecute(() ->{
+    if(safeForPlacer.getAsBoolean()){
+        placer.set(.15);
+    }
+    else{
+        placer.set(0);
+    }
+}
+    )
+    .isFinished(() -> {
+        if (bottomHasCoral()){
+            return true;
+        }
+            return false;
+        }
+    )
+    .onEnd(() -> placer.set(0));
+    }
 
 public Command positionCoral(){
     return commandBuilder("PlacerSubsystem.ingestCoral()").onExecute(() ->
