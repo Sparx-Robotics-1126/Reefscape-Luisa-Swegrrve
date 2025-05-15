@@ -90,7 +90,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         // .setMoveFF(0.05, 0.128)         //      |
         // .setTurnPID(0.05, 0.0, 0.2)  //      V
         .setBrakeMode(true, true)  // Think about turning move to false for testing?
-        .setLimits(4.0, 0.05, 5, 10.0, 30.0) 
+        .setLimits(4.0, 0.05, 6, 10.0, 30.0) 
 
                     // Velocity: the max speed the MOTORS are able to go. please don't change this.
                     // VelDeadband: how much deadband is needed on the controller to start moving. 
@@ -271,15 +271,20 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
             double roll = state.roll.getRadians();
 
 
+            // var antiBeach = Perspective.kOperator.toPerspectiveSpeeds(
+            //     new ChassisSpeeds(
+            //         Math.abs(pitch) > kBeachTolerance.value() ? Math.copySign(kBeachSpeed.value(), pitch) : 0.0,
+            //         Math.abs(roll) > kBeachTolerance.value()  ? Math.copySign(kBeachSpeed.value(), -roll) : 0.0,
+            //         0.0
+            //     ),
+            //     state.rotation
+            // );
             var antiBeach = Perspective.kOperator.toPerspectiveSpeeds(
-                new ChassisSpeeds(
-                    Math.abs(pitch) > kBeachTolerance.value() ? Math.copySign(kBeachSpeed.value(), pitch) : 0.0,
-                    Math.abs(roll) > kBeachTolerance.value()  ? Math.copySign(kBeachSpeed.value(), -roll) : 0.0,
+                new ChassisSpeeds(0.0,0.0,
                     0.0
                 ),
                 state.rotation
             );
-
             api.applyAssistedDriverInput(
                 x.getAsDouble(),
                 y.getAsDouble(),
