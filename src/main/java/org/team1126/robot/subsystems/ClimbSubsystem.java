@@ -22,8 +22,8 @@ public class ClimbSubsystem extends GRRSubsystem {
 
     public static enum ClimberPosition {
         kHome(0),
-        kOut(-112.55),
-        kIn(125);
+        kOut(-90),
+        kIn(140);
         
 
          private final TunableDouble position;

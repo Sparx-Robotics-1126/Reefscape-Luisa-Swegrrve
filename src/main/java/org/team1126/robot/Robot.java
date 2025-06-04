@@ -21,7 +21,7 @@ import org.team1126.lib.util.Tunable;
 import org.team1126.robot.commands.Autos;
 import org.team1126.robot.commands.Routines;
 import org.team1126.robot.commands.LED.RainbowCommand;
-import org.team1126.robot.subsystems.AlgaeAcquisition;
+// import org.team1126.robot.subsystems.AlgaeAcquisition;
 import org.team1126.robot.subsystems.ArmSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem.ClimberPosition;
@@ -45,7 +45,7 @@ public final class Robot extends TimedRobot {
     public final ExtensionSubsystem extension;
     public final ArmSubsystem arm;
     public final PlacerSubsystem placer;
-    public final AlgaeAcquisition algae;
+    // public final AlgaeAcquisition algae;
     public final Autos autos;
     public final LEDs leds;
     public final ReefSelection selection;
@@ -81,7 +81,7 @@ public final class Robot extends TimedRobot {
         extension = new ExtensionSubsystem(this);
         arm = new ArmSubsystem(this);
         placer = new PlacerSubsystem();
-        algae = new AlgaeAcquisition();
+        // algae = new AlgaeAcquisition();
         swerve = new Swerve();
         leds = new LEDs(0, 300); // PORT IS PWM!!
 
@@ -142,9 +142,9 @@ public final class Robot extends TimedRobot {
         operator.rightTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value),false));
         operator.leftTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kLeftTrigger.value),true));
 
-        operator.povRight().whileTrue(algae.acqAlgae(AlgaePosition.kOut,4));
-        operator.leftBumper().whileTrue(algae.goTo(AlgaePosition.kHome));
-        operator.rightBumper().whileTrue(algae.spitAlgae(-.5));
+        // operator.povRight().whileTrue(algae.acqAlgae(AlgaePosition.kOut,4));
+        // operator.leftBumper().whileTrue(algae.goTo(AlgaePosition.kHome));
+        // operator.rightBumper().whileTrue(algae.spitAlgae(-.5));
 
 
                 // m_operator.povRight().whileTrue(new AlgaeMoveToPosition(m_algae, 40));
