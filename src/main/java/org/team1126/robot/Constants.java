@@ -38,7 +38,7 @@ public final class Constants {
         public static final Translation2d kReefCenterRed = ChoreoAllianceFlipUtil.flip(kReefCenterBlue);
 
         public static final TunableDouble kPipeOffsetX = Tunable.doubleValue("swerve/pipeOffsetX", -1.38);
-        public static final TunableDouble kPipeOffsetYLeft = Tunable.doubleValue("swerve/pipeOffsetYLeft",-0.35);
+        public static final TunableDouble kPipeOffsetYLeft = Tunable.doubleValue("swerve/pipeOffsetYLeft",-0.25);
         public static final TunableDouble kPipeOffsetYRight = Tunable.doubleValue("swerve/pipeOffsetYRight",-0.03);
 
         public static final double kReefCenterToWallDistance = 0.781;

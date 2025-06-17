@@ -21,7 +21,7 @@ import org.team1126.lib.util.Tunable;
 import org.team1126.robot.commands.Autos;
 import org.team1126.robot.commands.Routines;
 import org.team1126.robot.commands.LED.RainbowCommand;
-// import org.team1126.robot.subsystems.AlgaeAcquisition;
+import org.team1126.robot.subsystems.AlgaeAcquisition;
 import org.team1126.robot.subsystems.ArmSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem.ClimberPosition;
@@ -45,13 +45,13 @@ public final class Robot extends TimedRobot {
     public final ExtensionSubsystem extension;
     public final ArmSubsystem arm;
     public final PlacerSubsystem placer;
-    // public final AlgaeAcquisition algae;
+    public final AlgaeAcquisition algae;
     public final Autos autos;
     public final LEDs leds;
     public final ReefSelection selection;
     public final Routines routines;
 
-    private final boolean isDemoMode = false;
+    private final boolean isDemoMode = true;
 
     private  double speedFactor = 1;
     private  double rotationFactor = 1;
@@ -81,7 +81,7 @@ public final class Robot extends TimedRobot {
         extension = new ExtensionSubsystem(this);
         arm = new ArmSubsystem(this);
         placer = new PlacerSubsystem();
-        // algae = new AlgaeAcquisition();
+        algae = new AlgaeAcquisition();
         swerve = new Swerve();
         leds = new LEDs(0, 300); // PORT IS PWM!!
 
@@ -106,12 +106,13 @@ public final class Robot extends TimedRobot {
             driver.y().whileTrue(climber.goTo(ClimberPosition.kHome));
             driver.x().whileTrue(climber.goTo(ClimberPosition.kIn));
             driver.b().whileTrue(climber.goTo(ClimberPosition.kOut));
+
+            driver.leftBumper().onTrue(selection.setLeft()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
+        driver.rightBumper().onTrue(selection.setRight()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
         }
         // driver.y().whileTrue(leds.setc)
 
         driver.leftStick().whileTrue(swerve.turboSpin(this::driverX, this::driverY, this::driverAngular));
-        driver.leftBumper().onTrue(selection.setLeft()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
-        driver.rightBumper().onTrue(selection.setRight()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
         driver.leftTrigger().onTrue(swerve.tareRotation());
 
         // Operator bindings
@@ -142,14 +143,12 @@ public final class Robot extends TimedRobot {
         operator.rightTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value),false));
         operator.leftTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kLeftTrigger.value),true));
 
-        // operator.povRight().whileTrue(algae.acqAlgae(AlgaePosition.kOut,4));
-        // operator.leftBumper().whileTrue(algae.goTo(AlgaePosition.kHome));
-        // operator.rightBumper().whileTrue(algae.spitAlgae(-.5));
+        operator.povRight().whileTrue(algae.acqAlgae(AlgaePosition.kOut,4));
+        operator.leftBumper().whileTrue(algae.goTo(AlgaePosition.kHome));
+        operator.rightBumper().whileTrue(algae.spitAlgae(-.5));
 
 
-                // m_operator.povRight().whileTrue(new AlgaeMoveToPosition(m_algae, 40));
-        // m_operator.leftBumper().whileTrue(new AlgaeMoveToHome(m_algae));
-        // m_operator.rightBumper().whileTrue(new SpitAlgae(m_algae));
+
 
         // Create triggers
         RobotModeTriggers.autonomous().whileTrue(autos.runSelectedAuto());

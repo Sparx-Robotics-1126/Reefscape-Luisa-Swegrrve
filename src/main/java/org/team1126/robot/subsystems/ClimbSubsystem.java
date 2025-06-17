@@ -22,7 +22,7 @@ public class ClimbSubsystem extends GRRSubsystem {
 
     public static enum ClimberPosition {
         kHome(0),
-        kOut(-90),
+        kOut(-95),
         kIn(140);
         
 
