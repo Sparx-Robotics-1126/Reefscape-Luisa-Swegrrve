@@ -51,12 +51,13 @@ public final class Robot extends TimedRobot {
     public final ReefSelection selection;
     public final Routines routines;
 
-    private final boolean isDemoMode = true;
+    private final boolean isDemoMode = false;
+    private final boolean isParadeMode = false;
 
     private  double speedFactor = 1;
     private  double rotationFactor = 1;
 
-    private final CommandXboxController driver;
+    private final CommandXboxController driver ;
     private final CommandXboxController operator;
     // private final CommandXboxController coDriver;
 
@@ -68,6 +69,11 @@ public final class Robot extends TimedRobot {
         if (isDemoMode){
             speedFactor = .5;
             rotationFactor = .75;
+        }
+
+        if (isParadeMode){
+            speedFactor = 0;
+            rotationFactor = 0;
         }
 
         // Configure logging
@@ -88,10 +94,18 @@ public final class Robot extends TimedRobot {
         selection = new ReefSelection();
 
         // Initialize controllers
-        driver = new CommandXboxController(Constants.kDriver);
+        if (!isParadeMode){
+            driver = new CommandXboxController(Constants.kDriver);
+            swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));
+            driver.leftStick().whileTrue(swerve.turboSpin(this::driverX, this::driverY, this::driverAngular));
+            driver.leftTrigger().onTrue(swerve.tareRotation());
+        }
+        else{
+            driver =new CommandXboxController(-1);
+        }
+
         operator = new CommandXboxController(Constants.kOperator);
-        
-        swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));
+       
         leds.setDefaultCommand(leds.setAllianceColorCommand());
         // arm.setDefaultCommand(new ControllerMoveArm(()-> operator.getRawAxis(XboxController.Axis.kLeftY.value), arm));
         extension.setDefaultCommand(extension.goTo(ExtensionPosition.kHome, this::safeForExtension));
@@ -108,12 +122,11 @@ public final class Robot extends TimedRobot {
             driver.b().whileTrue(climber.goTo(ClimberPosition.kOut));
 
             driver.leftBumper().onTrue(selection.setLeft()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
-        driver.rightBumper().onTrue(selection.setRight()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
+            driver.rightBumper().onTrue(selection.setRight()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
         }
         // driver.y().whileTrue(leds.setc)
 
-        driver.leftStick().whileTrue(swerve.turboSpin(this::driverX, this::driverY, this::driverAngular));
-        driver.leftTrigger().onTrue(swerve.tareRotation());
+      
 
         // Operator bindings
         operator.povDown().whileTrue(arm.goTo(ArmPosition.kHome)

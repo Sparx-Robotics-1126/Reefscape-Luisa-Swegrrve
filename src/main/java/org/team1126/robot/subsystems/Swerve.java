@@ -83,7 +83,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         
                     // Odometry: how fast the odometry updates, lower if we need lower CAN utilization. 
                     // Discretization: Should not be changed.
-                    .setMovePID(0.01, 0.0, 0.0)
+                    .setMovePID(0.01, 0.0, 0.004)
                     .setMoveFF(0.05, 0.127)
                     .setTurnPID(.05, 0.0, 0.2)
         // .setMovePID(0.08, 0.0, 0.0)  //PID tuning!!!
