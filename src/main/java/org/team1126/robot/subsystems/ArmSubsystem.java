@@ -9,6 +9,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -25,7 +27,7 @@ import org.team1126.lib.util.command.GRRSubsystem;
 import org.team1126.robot.Constants.ArmConstants;
 import org.team1126.robot.Robot;
 
-
+@Logged()
 public class ArmSubsystem extends GRRSubsystem {
 
     /**
@@ -54,7 +56,6 @@ public class ArmSubsystem extends GRRSubsystem {
     private SparkMax turnMotor;
     private SparkMax turnFollower; // follows turnMotor
     private SparkClosedLoopController turnController;
-    private final Robot robot;
 
     private DigitalInput homeSensor;
 
@@ -81,8 +82,7 @@ public class ArmSubsystem extends GRRSubsystem {
 
 //     ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(0.1, 0.1);
 
-    public ArmSubsystem(Robot robot) {
-        this.robot = robot;
+    public ArmSubsystem() {
         //   if (!RobotBase.isSimulation()){
 
         turnMotor = new SparkMax(ArmConstants.TURN_ONE_ID, MotorType.kBrushless);
@@ -103,6 +103,8 @@ public class ArmSubsystem extends GRRSubsystem {
         configurePID();
         configureSparkMaxes();
 
+        Tunable.pidController("arm/pid", turnMotor);
+        Tunable.pidController("arm/pid", turnFollower);
         //   }
     }
 
@@ -111,12 +113,12 @@ public class ArmSubsystem extends GRRSubsystem {
      */
     private void configurePID() {
 
-        var p=.03;
+        var p=.04;
         turnConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .p(p)
                 .i(0)
-                .d(0)
+                .d(.035)
                 .outputRange(-1, 1)
                 .velocityFF(1.0/5767);
                 // .minOutput(-.04).maxOutput(.06)

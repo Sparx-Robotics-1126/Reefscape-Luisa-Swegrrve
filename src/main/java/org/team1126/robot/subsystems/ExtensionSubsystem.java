@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -29,7 +30,7 @@ import org.team1126.robot.Constants.ArmConstants;
 import org.team1126.robot.Robot;
 import org.team1126.robot.subsystems.ArmSubsystem.ArmPosition;
 
-
+@Logged()
 public final class ExtensionSubsystem extends GRRSubsystem {
 
    
@@ -71,7 +72,6 @@ public final class ExtensionSubsystem extends GRRSubsystem {
     private static final TunableDouble kZeroTolerance = Tunable.doubleValue("extension/kZeroTolerance", 0.15);
 
     private SparkMax extension;
-    private final Robot robot;
     private SparkClosedLoopController extensionController;
 
     private RelativeEncoder extensionEncoder;
@@ -97,8 +97,7 @@ public final class ExtensionSubsystem extends GRRSubsystem {
                     kElevatorkV,
                     kElevatorkA);
 
-    public ExtensionSubsystem(Robot robot) {
-        this.robot = robot;
+    public ExtensionSubsystem() {
 //   if (!RobotBase.isSimulation()){
 
         extension = new SparkMax(ArmConstants.ELEVATOR_ID, MotorType.kBrushless);
@@ -114,6 +113,8 @@ public final class ExtensionSubsystem extends GRRSubsystem {
         initShuffleboard();
         configurePID();
         configureSparkMaxes();
+
+        Tunable.pidController("extension/pid", extension);
 //   }
 
     }
@@ -126,9 +127,9 @@ public final class ExtensionSubsystem extends GRRSubsystem {
 
         extensionConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .p(3.1)
+                .p(5)
                 .i(0)
-                .d(0)
+                .d(16)
                 .outputRange(-.25, .25)
                 .velocityFF(1.0/5767);
     }

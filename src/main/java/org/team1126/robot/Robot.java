@@ -84,8 +84,8 @@ public final class Robot extends TimedRobot {
 
         // Initialize subsystems
         climber = new ClimbSubsystem();
-        extension = new ExtensionSubsystem(this);
-        arm = new ArmSubsystem(this);
+        extension = new ExtensionSubsystem();
+        arm = new ArmSubsystem();
         placer = new PlacerSubsystem();
         algae = new AlgaeAcquisition();
         swerve = new Swerve();
@@ -132,14 +132,20 @@ public final class Robot extends TimedRobot {
         operator.povDown().whileTrue(arm.goTo(ArmPosition.kHome)
             .alongWith(extension.goTo(ExtensionPosition.kHome,  ()-> true) )); //arm home
 
+operator.a().whileTrue(arm.goTo(ArmPosition.kCoralStation)
+.alongWith(extension.goTo(ExtensionPosition.kCoralStation, this::safeForExtension)));
+
+operator.y().whileTrue(arm.goTo(ArmPosition.kLevel4)
+.alongWith(extension.goTo(ExtensionPosition.kLevel4, this::safeForExtension))); //arm l4
+
         operator.povUp().whileTrue(arm.goTo(ArmPosition.kCoralStation)
             .alongWith(extension.goTo(ExtensionPosition.kCoralStation, this::safeForExtension)).andThen(new WaitCommand(2))   //arm to coral station
             .alongWith(placer.ingestCoral(this::safeForPlacer).andThen(placer.positionCoral()).alongWith(leds.setReefLights(5))));          
         // operator.povUp().whileTrue(arm.goTo(ArmPosition.kCoralStation).alongWith(extension.goTo(ExtensionPosition.kCoralStation, this::safeForExtension)).withTimeout(1).andThen(placer.ingestCoral().andThen(placer.positionCoral()).alongWith(leds.setReefLights(5)))); //arm to coral station                                    
 
-        operator.a().whileTrue(arm.goTo(ArmPosition.kLevel1)
-            .alongWith(extension.goTo(ExtensionPosition.kLevel1, this::safeForExtension))
-            .alongWith(leds.setReefLights(1))); //arm l1
+        // operator.a().whileTrue(arm.goTo(ArmPosition.kLevel1)
+        //     .alongWith(extension.goTo(ExtensionPosition.kLevel1, this::safeForExtension))
+        //     .alongWith(leds.setReefLights(1))); //arm l1
 
         operator.x().whileTrue(arm.goTo(ArmPosition.kLevel2)
             .alongWith(extension.goTo(ExtensionPosition.kLevel2, this::safeForExtension))
@@ -149,9 +155,9 @@ public final class Robot extends TimedRobot {
             .alongWith(extension.goTo(ExtensionPosition.kLevel3, this::safeForExtension))
             .alongWith(leds.setReefLights(3))); //arm l3
 
-        operator.y().whileTrue(arm.goTo(ArmPosition.kLevel4)
-            .alongWith(extension.goTo(ExtensionPosition.kLevel4, this::safeForExtension))
-            .alongWith(leds.setReefLights(4))); //arm l4
+        // operator.y().whileTrue(arm.goTo(ArmPosition.kLevel4)
+        //     .alongWith(extension.goTo(ExtensionPosition.kLevel4, this::safeForExtension))
+        //     .alongWith(leds.setReefLights(4))); //arm l4
 
         operator.rightTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kRightTrigger.value),false));
         operator.leftTrigger(0.1).whileTrue(placer.analogPlacer(() -> operator.getRawAxis(XboxController.Axis.kLeftTrigger.value),true));
