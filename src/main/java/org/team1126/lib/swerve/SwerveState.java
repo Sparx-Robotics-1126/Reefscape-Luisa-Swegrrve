@@ -1,7 +1,5 @@
 package org.team1126.lib.swerve;
 
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -10,19 +8,16 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.team1126.lib.swerve.SwerveAPI.TimestampedPose;
 
 /**
  * Represents the state of the robot's drivetrain.
  */
-@Logged(strategy = Strategy.OPT_IN)
 public final class SwerveState {
 
     /**
      * Contains information about swerve module states and positions.
      */
-    @Logged(strategy = Strategy.OPT_IN)
     public static final class Modules {
 
         /** The current measured module positions. */
@@ -51,7 +46,6 @@ public final class SwerveState {
     /**
      * Represents the state of the odometry thread.
      */
-    @Logged(strategy = Strategy.OPT_IN)
     public static final class OdometryThread {
 
         /** If Phoenix timesync is being utilized. */
@@ -86,6 +80,8 @@ public final class SwerveState {
     public Rotation2d pitch;
     /** The robot's roll. */
     public Rotation2d roll;
+    /** The uncorrected blue origin relative odometry pose of the robot. */
+    public Pose2d odometryPose;
     /** The timestamp of the swerve state in seconds (FPGA time). */
     public double timestamp;
 
@@ -100,5 +96,6 @@ public final class SwerveState {
         rotation = Rotation2d.kZero;
         pitch = Rotation2d.kZero;
         roll = Rotation2d.kZero;
+        odometryPose = Pose2d.kZero;
     }
 }

@@ -13,50 +13,54 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.team1126.lib.util.Math2;
-import org.team1126.lib.util.Tunable;
-import org.team1126.lib.util.Tunable.TunableInteger;
+// import org.team1126.lib.util.Tunable;
+// import org.team1126.lib.util.Tunable.TunableInteger;
 import org.team1126.lib.util.command.GRRSubsystem;
 import org.team1126.robot.Constants.RioIO;
 import org.team1126.robot.util.ReefSelection;
+import org.team1126.lib.tunable.TunableTable;
+import org.team1126.lib.tunable.Tunables;
+import org.team1126.lib.tunable.Tunables.TunableInteger;
 
 @Logged
 public final class Lights {
 
+    private static final int LENGTH = 28;
+    private static final int COUNT = 3;
+
+    private static final TunableTable tunables = Tunables.getTable("lights");
+
     private static enum Color {
-        kLx(255, 255, 255),
-        kHasCoral(255, 255, 255),
-        kGoose(255, 255, 255),
-        kScored(0, 255, 0),
-        kDisabled(255, 18, 0),
-        kRedAlliance(255, 0, 0),
-        kBlueAlliance(0, 0, 255),
-        kOff(0, 0, 0);
+        LEVEL(255, 255, 255),
+        HAS_CORAL(255, 255, 255),
+        GOOSE(255, 255, 255),
+        SCORED(0, 255, 0),
+        GOOSE_ASSASSINATION(255, 0, 0),
+        DISABLED(255, 32, 0),
+        OFF(0, 0, 0);
 
         private final TunableInteger r;
         private final TunableInteger g;
         private final TunableInteger b;
 
         private Color(int r, int g, int b) {
-            this.r = Tunable.intValue("lights/colors/" + name() + "/r", r);
-            this.g = Tunable.intValue("lights/colors/" + name() + "/g", g);
-            this.b = Tunable.intValue("lights/colors/" + name() + "/b", b);
+            this.r = tunables.value(name() + "/r", r);
+            this.g = tunables.value(name() + "/g", g);
+            this.b = tunables.value(name() + "/b", b);
         }
 
         private int r() {
-            return r.value();
+            return r.get();
         }
 
         private int g() {
-            return g.value();
+            return g.get();
         }
 
         private int b() {
-            return b.value();
+            return b.get();
         }
     }
-
-    private static final int kStripLength = 200;
-    private static final int kStripCount = 1;
 
     public final Sides sides;
     public final Top top;
@@ -64,11 +68,9 @@ public final class Lights {
     private final AddressableLED lights;
     private final AddressableLEDBuffer buffer;
 
-    private int chaseIndex = 0;
-
     public Lights() {
-        lights = new AddressableLED(RioIO.kLights);
-        buffer = new AddressableLEDBuffer(kStripLength * kStripCount);
+        lights = new AddressableLED(RioIO.LIGHTS);
+        buffer = new AddressableLEDBuffer(LENGTH * COUNT);
 
         lights.setLength(buffer.getLength());
         lights.start();
@@ -95,23 +97,10 @@ public final class Lights {
      * Displays the disabled animation.
      */
     public Command disabled() {
-                if(DriverStation.getAlliance().get() == Alliance.Blue) {
-                    return Commands.startEnd(() -> setAll(Color.kBlueAlliance), () -> setAll(Color.kOff), sides, top)
-                    .ignoringDisable(true)
-                    .withName("Lights.disabled()");
-                } else {
-                    return Commands.startEnd(() -> setAll(Color.kRedAlliance), () -> setAll(Color.kOff), sides, top)
-                    .ignoringDisable(true)
-                    .withName("Lights.disabled()");
-                }
-
-
-        
-        // return Commands.startEnd(() -> setAll(color), () -> setAll(Color.kOff), sides, top)
-        //     .ignoringDisable(true)
-        //     .withName("Lights.disabled()");
+        return Commands.startEnd(() -> setAll(Color.DISABLED), () -> setAll(Color.OFF), sides, top)
+            .ignoringDisable(true)
+            .withName("Lights.disabled()");
     }
-
 
     @Logged
     public final class Sides extends GRRSubsystem {
@@ -123,7 +112,7 @@ public final class Lights {
          * @param color The color to apply.
          */
         private void setBoth(Color color) {
-            for (int i = 0; i < kStripLength; i++) {
+            for (int i = 0; i < LENGTH; i++) {
                 setBoth(i, color);
             }
         }
@@ -168,7 +157,7 @@ public final class Lights {
          * @param b Blue value from {@code 0} to {@code 255}.
          */
         private void setSingle(boolean left, int i, int r, int g, int b) {
-            if (i >= kStripLength) return;
+            if (i >= LENGTH) return;
             buffer.setRGB(!left ? i : buffer.getLength() - i - 1, r, g, b);
         }
 
@@ -179,64 +168,50 @@ public final class Lights {
         public Command levelSelection(ReefSelection selection) {
             return commandBuilder()
                 .onExecute(() -> {
-                    for (int i = 0; i < kStripLength; i++) {
+                    for (int i = 0; i < LENGTH; i++) {
                         for (int j = 0; j <= 1; j++) {
                             boolean blink = selection.isScoring() && (selection.isLeft() ? 0 : 1) == j;
 
                             if (
                                 (blink ? RobotController.getRSLState() : true) && i < ((28 / 4) * selection.getLevel())
                             ) {
-                                setSingle(j == 0, i, Color.kLx);
+                                setSingle(j == 0, i, Color.LEVEL);
                             } else {
-                                setSingle(j == 0, i, Color.kOff);
+                                setSingle(j == 0, i, Color.OFF);
                             }
                         }
                     }
                 })
-                .onEnd(() -> setBoth(Color.kOff))
+                .onEnd(() -> setBoth(Color.OFF))
                 .ignoringDisable(true)
                 .withName("Lights.Sides.levelSelection()");
         }
-        
-        public Command rainbowChase() {
-            return commandBuilder()
-                .onExecute(() -> {
-                    for (int i = 0; i < buffer.getLength(); i++) {
-                        final int hue = (i * 180 / buffer.getLength() + chaseIndex) % 180;
-                        buffer.setHSV(i, hue, 255, 128);
-                    }
-                    chaseIndex = (chaseIndex + 1) % 180;
-                    update();
-                })
-                .onEnd(() -> setBoth(Color.kOff))
-                .ignoringDisable(true)
-                .withName("Lights.Sides.rainbowChase()");
-        }
+
         /**
          * Displays the flames animation.
          */
         public Command flames() {
-            int[] state = new int[kStripLength];
+            int[] state = new int[LENGTH];
             for (int i = 0; i < state.length; i++) {
                 state[i] = 0;
             }
 
             return commandBuilder()
                 .onExecute(() -> {
-                    for (int i = 0; i < kStripLength; i++) {
+                    for (int i = 0; i < LENGTH; i++) {
                         state[i] = (int) Math.max(
                             0.0,
-                            state[i] - (Math2.random((0.5 + (i / (kStripLength * 0.11))) * 5.0) + 28.0)
+                            state[i] - (Math2.random((0.5 + (i / (LENGTH * 0.11))) * 5.0) + 28.0)
                         );
                     }
-                    for (int i = kStripLength - 1; i >= 2; i--) {
+                    for (int i = LENGTH - 1; i >= 2; i--) {
                         state[i] = (state[i - 1] + state[i - 2] + state[i - 2]) / 3;
                     }
                     if (Math.random() < 0.5) {
                         int i = (int) Math2.random(5.0);
                         state[i] = (int) (state[i] + Math2.random(160.0, 255.0));
                     }
-                    for (int i = 0; i < kStripLength; i++) {
+                    for (int i = 0; i < LENGTH; i++) {
                         int heat = (int) ((state[i] / 255.0) * 191.0);
                         int ramp = (heat & 63) << 2;
                         if (heat > 180) {
@@ -248,7 +223,7 @@ public final class Lights {
                         }
                     }
                 })
-                .onEnd(() -> setBoth(Color.kOff))
+                .onEnd(() -> setBoth(Color.OFF))
                 .ignoringDisable(true)
                 .withName("Lights.Sides.flames()");
         }
@@ -258,7 +233,7 @@ public final class Lights {
          */
         public Command off() {
             return commandBuilder()
-                .onInitialize(() -> setBoth(Color.kOff))
+                .onInitialize(() -> setBoth(Color.OFF))
                 .ignoringDisable(true)
                 .withName("Lights.Sides.off()");
         }
@@ -274,48 +249,70 @@ public final class Lights {
          * @param color The color to apply.
          */
         private void set(Color color) {
-            for (int i = 0; i < kStripLength; i++) set(i, color);
+            for (int i = 0; i < LENGTH; i++) set(i, color);
         }
 
         private void set(int i, Color color) {
-            if (i >= kStripLength) return;
-            buffer.setRGB(kStripLength + i, color.r(), color.g(), color.b());
+            if (i >= LENGTH) return;
+            buffer.setRGB(LENGTH + i, color.r(), color.g(), color.b());
         }
 
+
+
+        
         /**
          * Displays the "Has Coral" animation.
          */
         public Command hasCoral(BooleanSupplier goosing, DoubleSupplier goosePosition, ReefSelection selection) {
-            final double kGooseRange = 0.15;
-            final double kHalfRange = kGooseRange / 2.0;
+            final double GOOSE_RANGE = 0.15;
+            final double HALF_RANGE = GOOSE_RANGE / 2.0;
 
             return commandBuilder()
                 .onExecute(() -> {
                     if (!goosing.getAsBoolean()) {
-                        set(RobotController.getRSLState() ? Color.kHasCoral : Color.kOff);
+                        set(RobotController.getRSLState() ? Color.HAS_CORAL : Color.OFF);
                     } else {
                         double position = goosePosition.getAsDouble();
                         double percent =
-                            (MathUtil.clamp(Math.abs(position), 0.5 - kHalfRange, 0.5 + kHalfRange) -
-                                (0.5 - kHalfRange)) *
-                            (1.0 / kGooseRange);
+                            (MathUtil.clamp(Math.abs(position), 0.5 - HALF_RANGE, 0.5 + HALF_RANGE) -
+                                (0.5 - HALF_RANGE)) *
+                            (1.0 / GOOSE_RANGE);
                         if (position < 0.0) percent = 1.0 - percent;
-                        int closestLED = (int) Math.round(percent * (kStripLength - 1));
-                        for (int i = 0; i < kStripLength; i++) {
-                            if ((selection.isLeft() ? i > kStripLength - 4 : i < 4)) {
-                                set(i, RobotController.getRSLState() ? Color.kGoose : Color.kOff);
-                            } else if (Math.abs(closestLED - i) <= 1) {
-                                set(i, Color.kGoose);
+                        int closestLED = (int) Math.round(percent * (LENGTH - 1));
+                        for (int i = 0; i < LENGTH; i++) {
+                            if (Math.abs(closestLED - i) <= 1) {
+                                set(i, Color.GOOSE);
                             } else {
-                                set(i, Color.kOff);
+                                set(i, Color.OFF);
                             }
                         }
                     }
                 })
-                .onEnd(() -> set(Color.kOff))
+                .onEnd(() -> set(Color.OFF))
                 .ignoringDisable(true)
                 .withName("Lights.Top.hasCoral()");
         }
+
+        public Command tagLateralBar(DoubleSupplier normalizedLateral) {
+            final int width = 1; // produces a 2-LED bar around center index
+            return commandBuilder()
+                .onExecute(() -> {
+                    double percent = Math.max(0.0, Math.min(1.0, normalizedLateral.getAsDouble()));
+                    int center = (int) Math.round(percent * (LENGTH - 1));
+        
+                    for (int i = 0; i < LENGTH; i++) {
+                        if (Math.abs(center - i) <= width) {
+                            set(i, Color.GOOSE); // or add a new Color.TAG_POS
+                        } else {
+                            set(i, Color.OFF);
+                        }
+                    }
+                })
+                .onEnd(() -> set(Color.OFF))
+                .ignoringDisable(true)
+                .withName("Lights.Top.tagLateralBar()");
+        }
+
 
         /**
          * Displays the "Scored" animation.
@@ -325,11 +322,22 @@ public final class Lights {
 
             return commandBuilder()
                 .onInitialize(() -> timer.restart())
-                .onExecute(() -> set(timer.get() % 0.2 > 0.1 ? Color.kScored : Color.kOff))
-                .onEnd(() -> set(Color.kOff))
+                .onExecute(() -> set(timer.get() % 0.15 > 0.75 ? Color.SCORED : Color.OFF))
+                .onEnd(() -> set(Color.OFF))
                 .withTimeout(1.5)
                 .ignoringDisable(true)
                 .withName("Lights.Top.scored()");
+        }
+
+        /**
+         * Displays that the goose has been killed.
+         */
+        public Command gooseAssassination() {
+            return commandBuilder()
+                .onInitialize(() -> set(Color.GOOSE_ASSASSINATION))
+                .onEnd(() -> set(Color.OFF))
+                .ignoringDisable(true)
+                .withName("Lights.Top.gooseAssassination()");
         }
 
         /**
@@ -337,7 +345,7 @@ public final class Lights {
          */
         public Command off() {
             return commandBuilder()
-                .onInitialize(() -> set(Color.kOff))
+                .onInitialize(() -> set(Color.OFF))
                 .ignoringDisable(true)
                 .withName("Lights.Top.off()");
         }

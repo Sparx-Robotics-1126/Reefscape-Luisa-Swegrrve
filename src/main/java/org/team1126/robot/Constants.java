@@ -2,6 +2,7 @@ package org.team1126.robot;
 
 import org.team1126.lib.util.Tunable;
 import org.team1126.lib.util.Tunable.TunableDouble;
+import org.team1126.robot.util.Vision.CameraConfig;
 
 import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -44,22 +45,21 @@ public final class Constants {
         public static final double kReefCenterToWallDistance = 0.781;
     }
 
-    public final class Cameras {
-        
-        public static final Transform3d kLeft = new Transform3d(
-          new Translation3d(Units.inchesToMeters(10.75),
-          Units.inchesToMeters(7),
-          Units.inchesToMeters(8.25)),
-            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(-18.4))
-        );
-        public static final Transform3d kRight = new Transform3d(
-          new Translation3d(Units.inchesToMeters(10.75),
-          Units.inchesToMeters(-12),
-          Units.inchesToMeters(8.25)),
-            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(18.4))
-        );
-    }
+    public static final CameraConfig[] CAMERAS = {
 
+      new CameraConfig(
+          "left",
+          new Translation3d(Units.inchesToMeters(10.75), Units.inchesToMeters(7), Units.inchesToMeters(8.25)),
+          new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(-18.4))
+      ),
+      new CameraConfig(
+          "right",
+          new Translation3d(Units.inchesToMeters(10.75), Units.inchesToMeters(-12), Units.inchesToMeters(8.25)),
+          new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(18.4))
+      )
+  };
+    
+   
    
   public static final class ArmConstants {
     public static final int TURN_ONE_ID = 31;
@@ -107,7 +107,7 @@ public static final class CoralConstants {
 
         public static final int kIntakeBeamBreak = 9;
         public static final int kLights = 9;
-
+        public static final int LIGHTS = 9;
         public static final int kClimberLimitSwitch = 0;
     }
 

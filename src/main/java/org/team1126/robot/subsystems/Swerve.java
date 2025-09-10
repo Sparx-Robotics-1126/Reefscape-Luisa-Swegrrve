@@ -1,5 +1,6 @@
 package org.team1126.robot.subsystems;
 
+// import static edu.wpi.first.wpilibj2.command.Commands.*;
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
 
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.team1126.lib.swerve.Perspective;
@@ -29,6 +31,8 @@ import org.team1126.lib.swerve.config.SwerveModuleConfig;
 import org.team1126.lib.swerve.hardware.SwerveEncoders;
 import org.team1126.lib.swerve.hardware.SwerveIMUs;
 import org.team1126.lib.swerve.hardware.SwerveMotors;
+import org.team1126.lib.tunable.TunableTable;
+import org.team1126.lib.tunable.Tunables;
 import org.team1126.lib.util.Alliance;
 import org.team1126.lib.util.Math2;
 import org.team1126.lib.util.Mutable;
@@ -38,7 +42,7 @@ import org.team1126.lib.util.command.GRRSubsystem;
 import org.team1126.robot.Constants;
 import org.team1126.robot.Constants.FieldConstants;
 import org.team1126.robot.Constants.RobotMap;
-import org.team1126.robot.util.VisionManager;
+import org.team1126.robot.util.Vision;
 
 /**
  * The robot's swerve drivetrain.
@@ -46,6 +50,7 @@ import org.team1126.robot.util.VisionManager;
 @Logged
 public final class Swerve extends GRRSubsystem {
 
+      private static final TunableTable tunables = Tunables.getTable("swerve");
     private static final double kMoveRatio = (54.0 / 10.0) * (18.0 / 38.0) * (45.0 / 15.0);
     private static final double kTurnRatio = (22.0 / 10.0) * (88.0 / 16.0);
     private static final double kModuleOffset = Units.inchesToMeters(12.25);
@@ -127,8 +132,8 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
 
     private final SwerveAPI api;
     private final SwerveState state;
-    private final VisionManager vision;
-
+    // private final VisionManager vision;
+    private final Vision vision;
 
 
     private final PIDController autoPIDx;
@@ -148,11 +153,13 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
     private Pose2d reefReference = Pose2d.kZero;
     private boolean facingReef = false;
     private double wallDistance = 0.0;
+    private boolean changedReference = false;
 
     public Swerve() {
         api = new SwerveAPI(kConfig);
         state = api.state;
-        vision = VisionManager.getInstance();
+        vision = new Vision(Constants.CAMERAS);
+        // vision = VisionManager.getInstance();
 
 
         reefPIDx = new PIDController(6.0, 0.0, 0.40);
@@ -167,7 +174,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         angularPID.enableContinuousInput(-Math.PI, Math.PI);
         angularPID.setIZone(0.8);
 
-        api.enableTunables("swerve/api");
+        tunables.add("api", api);
         Tunable.pidController("swerve/autoPID", autoPIDx);
         Tunable.pidController("swerve/autoPID", autoPIDy);
         Tunable.pidController("swerve/autoPIDangular", autoPIDangular);
@@ -182,7 +189,7 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         api.refresh();
 
         // Apply vision estimates to the pose estimator.
-        api.addVisionMeasurements(vision.getUnreadResults(state.poseHistory));
+        api.addVisionMeasurements(vision.getUnreadResults(state.poseHistory, state.odometryPose));
 
         // Calculate helpers
         Translation2d reefCenter = Alliance.isBlue() ? FieldConstants.kReefCenterBlue : FieldConstants.kReefCenterRed;
@@ -199,6 +206,8 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         // to the reef wall relevant to the robot's position.
         reefReference = new Pose2d(reefCenter, reefAngle);
 
+        // Save if the reef angle has changed.
+        changedReference = !Math2.isNear(reefReference.getRotation(), reefAngle, 1e-6);
         // If the robot is rotated to face the reef, within an arbitrary tolerance.
         facingReef = Math2.epsilonEquals(
             0.0,
@@ -214,6 +223,13 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         );
 
         SmartDashboard.putBoolean("happyGOose", inRange());
+    }
+    /**
+     * Returns true if the reef angle has changed.
+     */
+    @NotLogged
+    public boolean changedReference() {
+        return changedReference;
     }
 
     /**
@@ -459,4 +475,19 @@ private static final SwerveModuleConfig kBackRight = new SwerveModuleConfig()
         private double error = 0.0;
         private double output = 0.0;
     }
-}
+
+    @NotLogged
+    public Optional<Rotation2d> getReefAngleIfFacing() {
+        return facingReef ? Optional.of(reefReference.getRotation()) : Optional.empty();
+    }
+
+    @NotLogged
+    public boolean isFacingReef() {
+        return facingReef;
+    }
+
+    @NotLogged
+    public Rotation2d getReefAngle() {
+        return reefReference.getRotation();
+    }
+    }

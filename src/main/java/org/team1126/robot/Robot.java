@@ -2,20 +2,32 @@ package org.team1126.robot;
 
 // import static edu.wpi.first.wpilibj.XboxController.Axis.*;
 // import static edu.wpi.first.wpilibj2.command.Commands.*;
-
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 import com.ctre.phoenix6.SignalLogger;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Threads;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.DoubleSupplier;
+
+import org.team1126.lib.logging.LoggedRobot;
+import org.team1126.lib.util.DisableWatchdog;
 import org.team1126.lib.util.Profiler;
 import org.team1126.lib.util.Tunable;
 import org.team1126.robot.commands.Autos;
@@ -27,15 +39,17 @@ import org.team1126.robot.subsystems.ClimbSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem.ClimberPosition;
 import org.team1126.robot.subsystems.ExtensionSubsystem;
 import org.team1126.robot.subsystems.LEDs;
+import org.team1126.robot.subsystems.Lights;
 import org.team1126.robot.subsystems.PlacerSubsystem;
 import org.team1126.robot.subsystems.Swerve;
 import org.team1126.robot.subsystems.AlgaeAcquisition.AlgaePosition;
 import org.team1126.robot.subsystems.ArmSubsystem.ArmPosition;
 import org.team1126.robot.subsystems.ExtensionSubsystem.ExtensionPosition;
 import org.team1126.robot.util.ReefSelection;
+import org.team1126.robot.util.TagLateralSupplier;
 
 @Logged
-public final class Robot extends TimedRobot {
+public final class Robot extends LoggedRobot {
 
     private final CommandScheduler scheduler = CommandScheduler.getInstance();
 
@@ -59,13 +73,20 @@ public final class Robot extends TimedRobot {
 
     private final CommandXboxController driver ;
     private final CommandXboxController operator;
-    // private final CommandXboxController coDriver;
+    private final AprilTagFieldLayout fieldLayout;
+        public final Lights lights;
+
+        final double lateralHalfRange = 1.5;
+        final TagLateralSupplier tagSup;// = new TagLateralSupplier(swerve, fieldLayout);
+         final AtomicReference<DoubleSupplier> lateralNormRef = new AtomicReference<>(() -> 0.0);
+final AtomicInteger lastTagId = new AtomicInteger(-1);
+private static final double TOP_BAR_HALF_RANGE_RAD = Math.toRadians(30.0);
 
     public Robot() {
         DriverStation.silenceJoystickConnectionWarning(true);
         // DisableWatchdog.in(scheduler, "m_watchdog");
         // DisableWatchdog.in(this, "m_watchdog");
-
+        fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
         if (isDemoMode){
             speedFactor = .5;
             rotationFactor = .75;
@@ -81,7 +102,7 @@ public final class Robot extends TimedRobot {
         DriverStation.startDataLog(DataLogManager.getLog());
         SignalLogger.enableAutoLogging(false);
         Epilogue.getConfig().root = "/Telemetry";
-
+        
         // Initialize subsystems
         climber = new ClimbSubsystem();
         extension = new ExtensionSubsystem();
@@ -90,8 +111,20 @@ public final class Robot extends TimedRobot {
         algae = new AlgaeAcquisition();
         swerve = new Swerve();
         leds = new LEDs(0, 300); // PORT IS PWM!!
-
+        lights = new Lights();
         selection = new ReefSelection();
+        Trigger changedReference = new Trigger(swerve::changedReference);
+
+        int targetTagId = 7;
+        double lateralHalfRange = 1.5;
+         tagSup = new TagLateralSupplier(swerve, fieldLayout );
+        DoubleSupplier lateralNorm = tagSup.normalizedLateralToTag(targetTagId, lateralHalfRange);
+      
+        // Wire LEDs top bar to angle-to-reef
+        new Trigger(this::isEnabled)
+        .and(() -> true)
+        .onFalse(lights.top.tagLateralBar(reefAngleBarSupplier())
+        .ignoringDisable(true));
 
         // Initialize controllers
         if (!isParadeMode){
@@ -167,7 +200,7 @@ operator.y().whileTrue(arm.goTo(ArmPosition.kLevel4)
         operator.rightBumper().whileTrue(algae.spitAlgae(-.5));
 
 
-
+        changedReference.and(RobotModeTriggers.teleop()).onTrue(setDriverRumble(1.0).withTimeout(0.15));
 
         // Create triggers
         RobotModeTriggers.autonomous().whileTrue(autos.runSelectedAuto());
@@ -179,6 +212,10 @@ operator.y().whileTrue(arm.goTo(ArmPosition.kLevel4)
 
         // Set thread priority
         Threads.setCurrentThreadPriority(true, 10);
+
+        // Disable loop overrun warnings from the command
+        // scheduler, since we already log loop timings
+        DisableWatchdog.in(scheduler, "m_watchdog");
     }
 
     /**
@@ -214,6 +251,8 @@ operator.y().whileTrue(arm.goTo(ArmPosition.kLevel4)
         // Profiler.run("lights", lights::update);
         Profiler.run("epilogue", () -> Epilogue.update(this));
         Profiler.run("tunables", Tunable::update);
+
+
         Profiler.end();
     }
 
@@ -255,5 +294,31 @@ operator.y().whileTrue(arm.goTo(ArmPosition.kLevel4)
     
     public boolean safeForPlacer() {
         return arm.getArmAngle() > (ArmPosition.kCoralStation.position()-3);
+    }
+
+    @NotLogged
+    public DoubleSupplier reefAngleBarSupplier() {
+        return () -> {
+            var maybeAngle = swerve.getReefAngleIfFacing();
+            if (maybeAngle.isEmpty()) {
+                return 0.0; // neutral when not facing reef / no target
+            }
+            var reefAngle = maybeAngle.get();
+            var current = swerve.getPose().getRotation();
+            double err = current.minus(reefAngle).getRadians(); // CCW+ error in [-pi, pi]
+            double norm = Math.max(-1.0, Math.min(1.0, err / TOP_BAR_HALF_RANGE_RAD));
+            return norm;
+        };
+    }
+
+      /**
+     * Returns a command that sets the rumble output of the driver's controller.
+     * @param value The normalized value (0 to 1) to set the rumble to.
+     */
+    private Command setDriverRumble(double value) {
+        return run(() -> driver.setRumble(RumbleType.kBothRumble, value))
+            .finallyDo(() -> driver.setRumble(RumbleType.kBothRumble, 0.0))
+            .ignoringDisable(true)
+            .withName("Robot.setDriverRumble(" + value + ")");
     }
 }
