@@ -21,7 +21,6 @@ import org.team1126.lib.util.Tunable;
 import org.team1126.robot.commands.Autos;
 import org.team1126.robot.commands.Routines;
 import org.team1126.robot.commands.LED.RainbowCommand;
-import org.team1126.robot.subsystems.AlgaeAcquisition.AlgaePosition;
 // import org.team1126.robot.subsystems.AlgaeAcquisition;
 import org.team1126.robot.subsystems.ArmSubsystem;
 import org.team1126.robot.subsystems.ClimbSubsystem;
@@ -53,12 +52,11 @@ public final class Robot extends TimedRobot {
     public final Routines routines;
 
     private final boolean isDemoMode = false;
-    private final boolean isParadeMode = false;
 
     private  double speedFactor = 1;
     private  double rotationFactor = 1;
 
-    private final CommandXboxController driver ;
+    private final CommandXboxController driver;
     private final CommandXboxController operator;
     // private final CommandXboxController coDriver;
 
@@ -72,11 +70,6 @@ public final class Robot extends TimedRobot {
             rotationFactor = .75;
         }
 
-        if (isParadeMode){
-            speedFactor = 0;
-            rotationFactor = 0;
-        }
-
         // Configure logging
         DataLogManager.start();
         DriverStation.startDataLog(DataLogManager.getLog());
@@ -85,8 +78,8 @@ public final class Robot extends TimedRobot {
 
         // Initialize subsystems
         climber = new ClimbSubsystem();
-        extension = new ExtensionSubsystem();
-        arm = new ArmSubsystem();
+        extension = new ExtensionSubsystem(this);
+        arm = new ArmSubsystem(this);
         placer = new PlacerSubsystem();
         // algae = new AlgaeAcquisition();
         swerve = new Swerve();
@@ -95,18 +88,10 @@ public final class Robot extends TimedRobot {
         selection = new ReefSelection();
 
         // Initialize controllers
-        if (!isParadeMode){
-            driver = new CommandXboxController(Constants.kDriver);
-            swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));
-            driver.leftStick().whileTrue(swerve.turboSpin(this::driverX, this::driverY, this::driverAngular));
-            driver.leftTrigger().onTrue(swerve.tareRotation());
-        }
-        else{
-            driver =new CommandXboxController(-1);
-        }
-
+        driver = new CommandXboxController(Constants.kDriver);
         operator = new CommandXboxController(Constants.kOperator);
-       
+        
+        swerve.setDefaultCommand(swerve.drive(this::driverX, this::driverY, this::driverAngular));
         leds.setDefaultCommand(leds.setAllianceColorCommand());
         // arm.setDefaultCommand(new ControllerMoveArm(()-> operator.getRawAxis(XboxController.Axis.kLeftY.value), arm));
         extension.setDefaultCommand(extension.goTo(ExtensionPosition.kHome, this::safeForExtension));
@@ -123,13 +108,13 @@ public final class Robot extends TimedRobot {
             driver.b().whileTrue(climber.goTo(ClimberPosition.kOut));
 
             driver.leftBumper().onTrue(selection.setLeft()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
-            driver.rightBumper().onTrue(selection.setRight()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
+        driver.rightBumper().onTrue(selection.setRight()).whileTrue(swerve.driveReef(this::driverX, this::driverY, this::driverAngular,selection::isLeft));
         }
         // driver.y().whileTrue(leds.setc)
 
-      
+        driver.leftStick().whileTrue(swerve.turboSpin(this::driverX, this::driverY, this::driverAngular));
+        driver.leftTrigger().onTrue(swerve.tareRotation());
 
-      
         // Operator bindings
         operator.povDown().whileTrue(arm.goTo(ArmPosition.kHome)
             .alongWith(extension.goTo(ExtensionPosition.kHome,  ()-> true) )); //arm home
@@ -161,6 +146,7 @@ public final class Robot extends TimedRobot {
         // operator.povRight().whileTrue(algae.acqAlgae(AlgaePosition.kOut,4));
         // operator.leftBumper().whileTrue(algae.goTo(AlgaePosition.kHome));
         // operator.rightBumper().whileTrue(algae.spitAlgae(-.5));
+
 
 
 
@@ -207,7 +193,7 @@ public final class Robot extends TimedRobot {
         Profiler.start("robotPeriodic");
         Profiler.run("scheduler", scheduler::run);
         // Profiler.run("lights", lights::update);
-        Profiler.run("epilogue", () -> Epilogue.update(this));
+        // Profiler.run("epilogue", () -> Epilogue.update(this));
         Profiler.run("tunables", Tunable::update);
         Profiler.end();
     }

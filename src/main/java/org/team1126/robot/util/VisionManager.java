@@ -10,10 +10,7 @@ import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.ArrayList;
@@ -25,8 +22,6 @@ import org.team1126.lib.swerve.SwerveAPI.TimestampedPose;
 import org.team1126.lib.swerve.SwerveAPI.VisionMeasurement;
 import org.team1126.robot.util.PhotonPoseEstimator;
 import org.team1126.lib.util.Alliance;
-import org.team1126.lib.util.Tunable;
-import org.team1126.lib.util.Tunable.TunableDouble;
 import org.team1126.robot.Constants.Cameras;
 import org.team1126.robot.util.PhotonPoseEstimator.ConstrainedSolvepnpParams;
 
@@ -51,27 +46,11 @@ public final class VisionManager {
     private final List<Pose2d> estimates = new ArrayList<>();
     private final List<Pose3d> targets = new ArrayList<>();
 
-    public static final TunableDouble rightY =  Tunable.doubleValue("rightCamera/Y", -20.0);
-
-    public static final  Transform3d kLeft = new Transform3d(
-          new Translation3d(Units.inchesToMeters(10),
-          Units.inchesToMeters(-10.25),
-          Units.inchesToMeters(8.25)),
-            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(18.4))
-        );
-        public static final Transform3d kRight = new Transform3d(
-          new Translation3d(Units.inchesToMeters(10),
-          Units.inchesToMeters(-10.25),
-          Units.inchesToMeters(8.25)),
-            new Rotation3d(0.0, Math.toRadians(17), Math.toRadians(13))
-        );
-
-
     private VisionManager() {
         aprilTags = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
         cameras = new Camera[] {
-            new Camera("left", kLeft),
-            new Camera("right", kRight)
+            new Camera("left", Cameras.kLeft),
+            new Camera("right", Cameras.kRight)
         };
 
         // Hit the undocumented Photon Turbo Button™
