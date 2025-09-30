@@ -76,10 +76,12 @@ public class PlacerSubsystem extends GRRSubsystem {
     private void configureSparkMaxes() {
         CANrangeConfiguration config = new CANrangeConfiguration();
         ProximityParamsConfigs proxConfig = new ProximityParamsConfigs();
-        config.ProximityParams.ProximityThreshold = 0.00000001;
-        config.FovParams.FOVRangeX = 7;
-        config.FovParams.FOVRangeY = 7;
+        config.ProximityParams.ProximityThreshold = .125;
+        config.FovParams.FOVRangeX = 6.7;
+        config.FovParams.FOVRangeY = 6.7;
         proxConfig.MinSignalStrengthForValidMeasurement = 15000;
+        
+        proxConfig.ProximityHysteresis = 0.009999999776482582;
         placerFollowerConfig.follow(PlacerConstants.PLACER_ID,true);
         placer.configure(placerConfig,  SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kNoPersistParameters);
         placerFollower.configure(placerFollowerConfig,  SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kNoPersistParameters);

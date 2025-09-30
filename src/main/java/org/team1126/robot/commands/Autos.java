@@ -63,6 +63,8 @@ public final class Autos {
         chooser.addRoutine("2 Note RIGHT", () -> SideCoralAuto(false));
         chooser.addRoutine("2 Note LEFT", () -> SideCoralAuto(true));
         chooser.addRoutine("Straight L4", () -> L4Test(false));
+        chooser.addRoutine("Leave", () -> Leave(false));
+        chooser.addRoutine("Left Straight", () -> Leave(false));
         // chooser.addRoutine("TEST AUTO", () -> TestLine(false));
         // chooser.addRoutine("FULL MOVE", () -> wholeMove(false));
         SmartDashboard.putData("autos", chooser);
@@ -103,8 +105,8 @@ public final class Autos {
 
         );
         
-        part1.atTime(.6).onTrue(routines.toCoral(arm, extension));
-        part1.atTime(.75).onTrue(routines.toL4(arm, extension));
+        part1.atTime(.05).onTrue(routines.toCoral(arm, extension));
+        part1.atTime(.1).onTrue(routines.toL4(arm, extension));
         part1.done()
         .onTrue(
             Commands.sequence(
@@ -176,7 +178,7 @@ public final class Autos {
         );
 
         straightPath.atTime(.05).onTrue(routines.toCoral(arm, extension).withTimeout(.25));
-        straightPath.atTime(.5).onTrue(routines.toL4(arm, extension));
+        // straightPath.atTime(.5).onTrue(routines.toL4(arm, extension));
 
         straightPath.done().onTrue(
             sequence(
@@ -301,4 +303,87 @@ public final class Autos {
 
     return routine;
 } 
+private AutoRoutine Leave(boolean mirror) {
+
+    AutoRoutine routine = factory.newRoutine("TestPath");
+
+    AutoTrajectory straightPath = routine.trajectory("TestPath", mirror);
+
+    routine
+    .active()
+    .onTrue(
+        sequence(
+            parallel(
+                swerve.resetAutoPID()
+            ),
+            straightPath.spawnCmd()
+
+        )
+    );
+
+    // straightPath.atTime(.05).onTrue();
+    // straightPath.atTime(.5).onTrue(routines.toL4(arm, extension));
+
+    straightPath.done().onTrue(
+        sequence(
+            parallel(
+                // routines.toL4(arm, extension),
+                // routines.driveToCoral(true)
+            ).withTimeout(1),
+            parallel(
+                // routines.placeL4(arm, extension, placer)
+
+            ).withTimeout(2)
+            // routines.toCoral(arm, extension).withTimeout(3)
+            
+        )
+
+    );
+
+    return routine;
+
+}
+
+
+private AutoRoutine LeftStraight(boolean mirror) {
+
+    AutoRoutine routine = factory.newRoutine("LeftStraight");
+
+    AutoTrajectory straightPath = routine.trajectory("LeftStraight", mirror);
+
+    routine
+    .active()
+    .onTrue(
+        sequence(
+            parallel(
+                swerve.resetAutoPID()
+            ),
+            straightPath.spawnCmd()
+
+        )
+    );
+
+    // straightPath.atTime(.05).onTrue();
+    // straightPath.atTime(.5).onTrue(routines.toL4(arm, extension));
+
+    straightPath.done().onTrue(
+        sequence(
+            parallel(
+                // routines.toL4(arm, extension),
+                // routines.driveToCoral(true)
+            ).withTimeout(1),
+            parallel(
+                // routines.placeL4(arm, extension, placer)
+
+            ).withTimeout(2)
+            // routines.toCoral(arm, extension).withTimeout(3)
+            
+        )
+
+    );
+
+    return routine;
+
+}
+
 }

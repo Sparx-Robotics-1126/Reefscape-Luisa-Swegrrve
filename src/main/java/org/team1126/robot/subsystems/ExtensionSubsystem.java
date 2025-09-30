@@ -39,7 +39,7 @@ public final class ExtensionSubsystem extends GRRSubsystem {
         kLevel1(0.013659),
         kLevel2(-0.1431989),
         kLevel3(-0.2),
-        kLevel4(-0.55);
+        kLevel4(-0.65);
 
         private final TunableDouble position;
 

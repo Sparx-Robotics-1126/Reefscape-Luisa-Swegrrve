@@ -35,9 +35,9 @@ public class ArmSubsystem extends GRRSubsystem {
         kHome(0),
         kCoralStation(18.442849922180176),
         kLevel1(11.76196),
-        kLevel2(21.238),
-        kLevel3(26.5),
-        kLevel4(33.5);
+        kLevel2(22.238),
+        kLevel3(27.5),
+        kLevel4(32.5);
 
         private final TunableDouble position;
 
@@ -111,7 +111,7 @@ public class ArmSubsystem extends GRRSubsystem {
      */
     private void configurePID() {
 
-        var p=.03;
+        var p=.05;
         turnConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .p(p)
